@@ -3,12 +3,12 @@ title:              Walden Li
 bio:                'Research Assistant, Cognitive Control Lab'
 description:        "My Website"
 reading_time:       true
-words_per_minute:   200
+words_per_minute:   120
 logo:               'assets/img/logo.png'
 background:         'assets/img/placeholder-big.jpg'
 tiled_bg:           true   # Set this true if you want to tile your background image, otherwise it will be covered
 locale:             en_US
-url:                https://waldenyl.github.io/
+url:                https://waldenyl.github.io
 
 # Jekyll
 permalink:          /:title/
@@ -40,7 +40,7 @@ disqus_shortname:   taylantatli
 email:              li.6942@osu.edu
 #twitter:            username
 #facebook:           username
-github-url:         waldenyl
+#github-url:         waldenyl
 #stackoverflow:     123456/username   from a "http://stackoverflow.com/users/123456/username" link
 #linkedin:          username
 #xing:              username
