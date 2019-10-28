@@ -7,12 +7,14 @@ comments: false
 
 Yes, this is a very nerdy page. But I'm excited to tell you my TOP 10 favorite books!
 
-### 1. _Le Petit Prince_ / The Little Prince
+### 1. _Le Petit Prince_ / _The Little Prince_
 
-Anthor: Antoine de Saint-Exupéry
+**Antoine de Saint-Exupéry**
 
 ### 2. _Walden_
 
 ### 3. _Robinson_
 
-### 4. 
+### 4. 色彩を持たない多崎つくると、彼の巡礼の年 / _Colorless Tsukuru Tazaki and His Years of Pilgrimage_
+
+**村上春樹 / Haruki Murakami**
