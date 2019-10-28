@@ -9,7 +9,7 @@ Yes, this is a very nerdy page. But I'm excited to tell you my TOP 10 favorite b
 
 ### 1. _Le Petit Prince_ / _The Little Prince_
 
-**Antoine de Saint-Exupéry**
+* **Antoine de Saint-Exupéry**
 
 ### 2. _Walden_
 
@@ -17,4 +17,4 @@ Yes, this is a very nerdy page. But I'm excited to tell you my TOP 10 favorite b
 
 ### 4. 色彩を持たない多崎つくると、彼の巡礼の年 / _Colorless Tsukuru Tazaki and His Years of Pilgrimage_
 
-**村上春樹 / Haruki Murakami**
+* **村上春樹 / Haruki Murakami**
