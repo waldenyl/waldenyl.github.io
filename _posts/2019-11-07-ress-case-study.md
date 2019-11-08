@@ -1,5 +1,5 @@
 ---
-layout: project
+layout: page
 title: "Linear spatial filters (RESS) in analyzing steady-state evoked potentials: Notes and comments on Cohen's procedure"
 date: 2019-11-07
 excerpt: "RESS Case Study"
