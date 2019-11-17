@@ -18,17 +18,9 @@ comments: false
 ![](IMG_20190808_125018.jpg)
 <html>
   <head>
-    <meta charset="utf8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
-    <meta name="description" content="description of your site">
-    <meta name="author" content="author of the site">
-      <title>Research | Zucker Computational Vision Group</title>
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300">
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Rosario:400,400italic,700">
-    <!-- build:css /styles/style.css-->
+
     <link rel="stylesheet" href="styles/reset.css">
     <link rel="stylesheet" href="styles/style.css">
-    <!-- endbuild-->
   </head>
   <body>
     <div id="wrapper">
