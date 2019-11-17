@@ -16,28 +16,8 @@ comments: false
 ![](IMG_20190517_215633.jpg)
 
 ![](IMG_20190808_125018.jpg)
-<html>
-  <head>
 
-    <link rel="stylesheet" href="styles/reset.css">
-    <link rel="stylesheet" href="styles/style.css">
-  </head>
-  <body>
-    <div id="wrapper">
-      <nav id="main-nav">
-        <ul>
-          <li>
-            <h1><a href="index.html">Zucker<span class='lab'>lab</span></a></h1>
-          </li>
-          <li><a href="index.html">Research</a></li>
-          <li><a href="people.html">People</a></li>
-          <li><a href="publications.html">Publications</a></li>
-          <li><a href="bio.html">About Steve</a></li>
-          <li><a href="contact.html">Contact</a></li>
-        </ul>
-        <div id="sidecontent">
-        </div>
-      </nav>
+
       <div id="content">
         <h1>Research</h1>
         <p>Computational vision is at the heart of biomedicine and robotics, but is still quite primitive when compared with our own visual sense. We effortlessly demonstrate enormous flexibility and generality, which hides its staggering complexity: Nearly half of the primate brain processes visual information. Our group is attempting to put the requirements of vision systems together with insights from neurophysiology and the rigor of mathematics to develop an abstract theory of computational vision.  Based on differential geometry, it leads to methods of curve detection and shading and texture analysis.</p>
@@ -54,7 +34,7 @@ comments: false
             <div class="description">Learning and high-order statistics</div></a>
         </div>
         <h3 id="second-group-name">Computational Biology</h3>
-        <div id="project-thumbnails"><a href="projects/plant_growth.html" style="background-image: url(IMG_20190502_112445.jpg)" class="project-link">
+        <div id="project-thumbnails"><a href="projects/plant_growth.html" style="background-image: url(img/projects/plant_growth.png)" class="project-link">
             <div class="description">Plant growth and development</div></a><a href="projects/myofibril_geometry.html" style="background-image: url(img/projects/myofibril_geometry.png)" class="project-link">
             <div class="description">Heart myofibril geometry</div></a><a href="projects/bacteria.html" style="background-image: url(img/projects/bacteria.png)" class="project-link">
             <div class="description">Crowd computing with bacteria</div></a>
@@ -63,5 +43,3 @@ comments: false
     </div>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="scripts/index.js"></script>
-  </body>
-</html>
