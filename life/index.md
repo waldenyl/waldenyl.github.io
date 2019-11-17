@@ -16,3 +16,60 @@ comments: false
 ![](IMG_20190517_215633.jpg)
 
 ![](IMG_20190808_125018.jpg)
+<html>
+  <head>
+    <meta charset="utf8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+    <meta name="description" content="description of your site">
+    <meta name="author" content="author of the site">
+      <title>Research | Zucker Computational Vision Group</title>
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300">
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Rosario:400,400italic,700">
+    <!-- build:css /styles/style.css-->
+    <link rel="stylesheet" href="styles/reset.css">
+    <link rel="stylesheet" href="styles/style.css">
+    <!-- endbuild-->
+  </head>
+  <body>
+    <div id="wrapper">
+      <nav id="main-nav">
+        <ul>
+          <li>
+            <h1><a href="index.html">Zucker<span class='lab'>lab</span></a></h1>
+          </li>
+          <li><a href="index.html">Research</a></li>
+          <li><a href="people.html">People</a></li>
+          <li><a href="publications.html">Publications</a></li>
+          <li><a href="bio.html">About Steve</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <div id="sidecontent">
+        </div>
+      </nav>
+      <div id="content">
+        <h1>Research</h1>
+        <p>Computational vision is at the heart of biomedicine and robotics, but is still quite primitive when compared with our own visual sense. We effortlessly demonstrate enormous flexibility and generality, which hides its staggering complexity: Nearly half of the primate brain processes visual information. Our group is attempting to put the requirements of vision systems together with insights from neurophysiology and the rigor of mathematics to develop an abstract theory of computational vision.  Based on differential geometry, it leads to methods of curve detection and shading and texture analysis.</p>
+        <h3 id="first-group-name">Computational Vision</h3>
+        <div id="project-thumbnails"><a href="projects/cocircularity.html" style="background-image: url(img/projects/cocircularity.png)" class="project-link">
+            <div class="description">Curvature and co-circularity</div></a><a href="projects/flows_3D.html" style="background-image: url(img/projects/flows_3D.png)" class="project-link">
+            <div class="description">Flows and 3D</div></a><a href="projects/object_shape.html" style="background-image: url(img/projects/object_shape.png)" class="project-link">
+            <div class="description">Object shape</div></a>
+        </div>
+        <h3 id="second-group-name">Computational Neuroscience</h3>
+        <div id="project-thumbnails"><a href="projects/neuronal_cliques.html" style="background-image: url(img/projects/neuronal_cliques.png)" class="project-link">
+            <div class="description">Computing with neuronal cliques</div></a><a href="projects/colors_shape_material.html" style="background-image: url(img/projects/colors_shape_material.png)" class="project-link">
+            <div class="description">Colors, shape, material</div></a><a href="projects/learning.html" style="background-image: url(img/projects/learning.png)" class="project-link">
+            <div class="description">Learning and high-order statistics</div></a>
+        </div>
+        <h3 id="second-group-name">Computational Biology</h3>
+        <div id="project-thumbnails"><a href="projects/plant_growth.html" style="background-image: url(img/projects/plant_growth.png)" class="project-link">
+            <div class="description">Plant growth and development</div></a><a href="projects/myofibril_geometry.html" style="background-image: url(img/projects/myofibril_geometry.png)" class="project-link">
+            <div class="description">Heart myofibril geometry</div></a><a href="projects/bacteria.html" style="background-image: url(img/projects/bacteria.png)" class="project-link">
+            <div class="description">Crowd computing with bacteria</div></a>
+        </div>
+      </div>
+    </div>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="scripts/index.js"></script>
+  </body>
+</html>
