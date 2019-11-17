@@ -18,7 +18,6 @@ comments: false
 ![](IMG_20190808_125018.jpg)
 
 <body>
-    <link rel="stylesheet" href="styles/reset.css">
     <link rel="stylesheet" href="styles/style.css">
       <div id="content">
         <h1>Research</h1>
