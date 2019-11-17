@@ -17,7 +17,7 @@ comments: false
 
 ![](IMG_20190808_125018.jpg)
 
-
+<body>
       <div id="content">
         <h1>Research</h1>
         <p>Computational vision is at the heart of biomedicine and robotics, but is still quite primitive when compared with our own visual sense. We effortlessly demonstrate enormous flexibility and generality, which hides its staggering complexity: Nearly half of the primate brain processes visual information. Our group is attempting to put the requirements of vision systems together with insights from neurophysiology and the rigor of mathematics to develop an abstract theory of computational vision.  Based on differential geometry, it leads to methods of curve detection and shading and texture analysis.</p>
@@ -43,3 +43,4 @@ comments: false
     </div>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="scripts/index.js"></script>
+</body>
