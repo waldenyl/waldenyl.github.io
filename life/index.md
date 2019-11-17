@@ -62,7 +62,7 @@ comments: false
             <div class="description">Learning and high-order statistics</div></a>
         </div>
         <h3 id="second-group-name">Computational Biology</h3>
-        <div id="project-thumbnails"><a href="projects/plant_growth.html" style="background-image: url(img/projects/plant_growth.png)" class="project-link">
+        <div id="project-thumbnails"><a href="projects/plant_growth.html" style="background-image: url(IMG_20190502_112445.jpg)" class="project-link">
             <div class="description">Plant growth and development</div></a><a href="projects/myofibril_geometry.html" style="background-image: url(img/projects/myofibril_geometry.png)" class="project-link">
             <div class="description">Heart myofibril geometry</div></a><a href="projects/bacteria.html" style="background-image: url(img/projects/bacteria.png)" class="project-link">
             <div class="description">Crowd computing with bacteria</div></a>
