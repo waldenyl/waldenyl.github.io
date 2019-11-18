@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: post
 title: "Linear spatial filters (RESS) in analyzing steady-state evoked potentials: Study Notes"
 date: 2019-11-07
 excerpt: "RESS Case Study"
