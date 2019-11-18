@@ -1,5 +1,5 @@
 ---
-layout: project
+layout: page
 title: "How Plausible is Representational Pluralism"
 date: 2019-09-19
 excerpt: "Representational Pluralism"
