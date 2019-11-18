@@ -4,7 +4,6 @@ title: "Linear spatial filters (RESS) in analyzing steady-state evoked potential
 date: 2019-11-07
 excerpt: "RESS Case Study"
 tags: [research project]
-project: false
 comments: false
 ---
 
