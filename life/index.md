@@ -8,6 +8,8 @@ comments: false
 ![](IMG_20190502_112445.jpg)
 
 ![](IMG_20190502_123019.jpg)
+This is the most beautiful road I have ever driven on in the United States. Fun fact: I also used this photo in my lane detection project.
+
 
 ![](IMG_20190517_131733.jpg)
 
