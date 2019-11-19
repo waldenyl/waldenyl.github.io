@@ -1,9 +1,9 @@
 ---
 layout: page
-title: "How Plausible is Representational Pluralism"
-date: 2019-09-19
-excerpt: "Representational Pluralism"
-tags: [research project]
+title: "Lane Detection in Static and Dynamic Changing Environment Using OpenCV"
+date: 2019-08-15
+excerpt: "Lane detection "
+tags: [computer vision, project]
 project: true
 comments: false
 ---
