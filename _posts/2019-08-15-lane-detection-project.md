@@ -1,5 +1,5 @@
 ---
-layout: project
+layout: post
 title: "Lane Detection in Static and Dynamic Changing Environment Using OpenCV"
 date: 2019-08-15
 excerpt: "Lane detection "
