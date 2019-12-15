@@ -5,4 +5,4 @@ excerpt: "A List of works"
 comments: false
 ---
 
-![ACVS](../assets/img/post_pics/01.png "A sample ACVS display")
+![ACVS](../assets/docs/ac_space_thesis.pdf "A sample ACVS display")
