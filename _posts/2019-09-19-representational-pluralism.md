@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: post
 title: "How Plausible is Representational Pluralism"
 date: 2019-09-19
 excerpt: "Representational Pluralism"
@@ -7,6 +7,8 @@ tags: [research project]
 project: true
 comments: false
 ---
+
+<center> Last Update: 12/16/2019 </center>
 
 Despite a few radically deviated theories, _representation_ is still a critical concept in cognitive science research. The nature of representation, however, is a big problem for cognitive psychology, neuroscience, and philosophy of mind. I still remember Alex said in his class that the topic of representation is something we all refer to, but few people really know when they are referring to it. 
 
