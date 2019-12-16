@@ -8,7 +8,7 @@ project: true
 comments: false
 ---
 
-<center> Last Update: 12/16/2019 </center>
+<p align=center> Last Update: 12/16/2019 </p>
 
 Despite a few radically deviated theories, _representation_ is still a critical concept in cognitive science research. The nature of representation, however, is a big problem for cognitive psychology, neuroscience, and philosophy of mind. I still remember Alex said in his class that the topic of representation is something we all refer to, but few people really know when they are referring to it. 
 
@@ -34,7 +34,6 @@ In sum, the argument about holistic binding is as followed:
 - Icons represent holistically, because parts of icons represent various features at once. So a heart like this ❤ has its shape and color encoded together, no constituents of the heart representation correspond to only the shape or the color of the heart. In other words, as you mentioned, there is no syntactic separation between the features.
 
 2. Features are not bound holistically in PORs.
-
 - If features are bound holistically, then loss of one feature will cause the loss of the object identity. This is not the case with MOT, because observers can easily track up to about four objects even if their features are changed or deleted during their movement. Therefore, features are not bound holistically.
 
 3. With (1) and (2), we know that PORs are not simply icons.
