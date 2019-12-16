@@ -27,13 +27,13 @@ def to_grayscale(img):
     return cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 ```
 
-Once the image is converted to grayscale, the next step is to reduce noise by applying Gaussian blur. This is the same idea as in EEG signal processing, where we apply xxxxxxxx.
+Once the image is converted to grayscale, the next step is to reduce noise by applying Gaussian blur. This is the same idea as in EEG signal processing, where we apply filters.
 
 
 ## Canny Edge Detection (Canny, 1986)
 
 Wherever we see a sharp change in intensity or color, there could be an edge.
-Then, xxxxxxxx
+Then, 
 
 The algorithm is implemented in four steps. I'll be using a tutorial from Bill Green (2002).
 
