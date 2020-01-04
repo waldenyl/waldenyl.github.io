@@ -8,6 +8,15 @@ project: true
 comments: false
 ---
 
+## Loading the image
+OpenCV reads an image using the method _imread_. Here I load a photo taken when I was driving in Hocking Hills State Park.
+
+![Hocking Hills lane](../assets/img/post_pics/IMG_20190502_123019.png "A driveway in Hocking Hills State Park")
+
+
+```
+img = cv2.imread('IMG_20190502_123019.jpg')
+```
 
 Since the original image was 4032 * 2268, I need to resize it by about 30%. The resized image thus has
 
