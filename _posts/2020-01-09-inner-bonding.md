@@ -22,7 +22,7 @@ While not coming from a clinical background, I find the theory and practice of w
 Many societal problems, when analyzed in an individual level, can be attributed to interpersonal relationships that are deeply rooted in one's relationship with caretakes in early years.
 The society also deals with profound loneliness. People are feeling less and less connected.
 There seems to be a need to improve the psychological well-being of people around us, especially in developing countries like my home country.
-In China, the average available mental health resources is less than 1% of those availble to an average American person.
+In China, the available mental health resource per person is less than 1% of that of America.
 
-I've come to believe that regardless of where we come from, no matter how much resource we can get to support us, ultimately, we are the only ones who can save ourselves.
+I've come to believe that regardless of where we come from, no matter how many resources we can get to support us, ultimately, we are the only ones who can save ourselves.
 I'm not pessimistic about the kindness of the human race and the fact that a lot of people are happily and deeply bonded to their fellow humans, but I also believe that one who is truly independent is the best candidate for deep bondings with others.
