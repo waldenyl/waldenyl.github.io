@@ -1,0 +1,2571 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EAL4 online version - Cognitive Control Lab</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+  <!--JAVASCRIPT_INCLUDES_BEGIN-->
+    <script src="https://s3.amazonaws.com/mturk-public/externalHIT_v1.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bowser/1.9.4/bowser.min.js"></script>
+  <!--JAVASCRIPT_INCLUDES_END-->
+
+  <!--CSS_INCLUDES_BEGIN-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono:400,500,700|Open+Sans:400,400i,700,700i">
+  <!--CSS_INCLUDES_END-->
+
+  <style>
+:root #header + #content > #left > #rlblock_left {
+  display: none !important;
+}
+body {
+  background-color: black;
+  overflow: hidden;
+  //min-height: 100vmin;
+}
+H1 {
+  font-family: 'Open Sans', 'Ariel';
+  font-size: 2em;
+}
+H2 {
+  font-family: 'Open Sans', 'Ariel';
+  font-size: 1.2em;
+}
+p {
+  font-family: 'Open Sans', 'Ariel';
+  font-size: 1em;
+  color: white;
+}
+li {
+  font-family: 'Open Sans', 'Ariel';
+  font-size: 1em;
+  color: white;
+  text-align: left;
+}
+.ace_header {
+  background-color: black;
+  color: white;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  margin-right: 0px;
+  margin-left: 0px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-right: 10px;
+  padding-left: 10px;
+  font-family: 'Open Sans', 'Ariel';
+  font-size: 2em;
+}
+.ace_message_area {
+  background-color: black;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  margin-right: 0px;
+  margin-left: 0px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-right: 10px;
+  padding-left: 10px;
+  font-family: 'Open Sans', 'Ariel';
+  font-size: 1em;
+}
+.ace_workspace {
+}
+.ace_gui_container {
+  text-align: center;
+}
+.ace_gui_div {
+  display: inline-block;
+}
+.ace_pretty_text {
+  font-family: 'Open Sans', 'Ariel';
+  font-weight: 400;
+  fill: white;
+}
+.ace_open_tab_button{
+  background-color: rgba(240,240,240,1.0);
+  border-style: outset;
+  border-color: rgba(230,230,230,1.0);
+  border-radius: 5px;
+  color: rgba(0,0,0,1.0);
+  text-decoration: none;
+  padding: 4px;
+  display: inline-block;
+}
+.ace_svg_container {
+  display: inline-block;
+  position: relative;
+  width: 90vmin;
+  height: 90vmin;
+  padding-bottom: 100%; /* aspect ratio */
+  vertical-align: top;
+  overflow: hidden;
+}
+.ace_svg_content_responsive {
+  display: inline-block;
+  position: absolute;
+  top: 0px;
+  left: 0;
+}
+.ace_centered_div_container {
+  margin: 0;
+  height: 90vmin;
+  position: relative;
+}
+.ace_centered_div_content {
+  margin: 0;
+  position: absolute;
+  top: 45%;
+  left: 48%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+}
+  </style>
+</head>
+
+
+<body>
+  <!-- If we are in the MTurk iframe window, this button shows up so the user
+       can open the app in a new full sized window -->
+  <div id="ace_instructions" style="text-align:left">
+    <p><b>Qualifications:</b></p>
+    <ul>
+      <li> Must be at 18-45 years of age and speak fluent English to participate. </li>
+      <li> Must have normal or corrected visual acuity. </li>
+      <li> Must have normal color vision. </li>
+    </ul>
+    <p><b>Instructions:</b></p>
+    <ol>
+      <li> Accept the HIT. </li>
+      <li> Complete the experiment.</li>
+      <li> Return here and click the submit button. </li>
+      <li> You should only complete this HIT once. </li>
+    </ol>
+
+    <p style="margin-left: 3em;">
+      <a class="ace_open_tab_button" href="" target="_blank">Click here to start (opens in new tab)</a>
+    </p>
+
+    <form name="mturk_form" method="POST" id="mturk_form" action="https://workersandbox.mturk.com/mturk/externalSubmit" onsubmit="return validate_form()" style="margin-left: 3em;">
+      <p>
+        <input type="hidden" value="" name="assignmentId" id="assignmentId"/>
+        <input type="hidden" value="" name="hitId" id="hitId"/>
+        <input type="hidden" value="" name="workerId" id="workerId"/>
+      </p>
+      <p class="text-center">
+        <input class="ace_open_tab_button" id="submitButton" type="submit" value="Submit" />
+      </p>
+      <p>
+        <input id="user_result" name="user_result" type="text" value="" style="display:none;"/>
+      </p>
+    </form>
+  </div>
+
+  <!-- This is where the GUI will be inserted -->
+  <div class="ace_gui_container">
+    <div id="gui" class="gui_div">
+    </div>
+  </div>
+
+
+  <script>
+let acvs_version = {};
+// Define an objection which will act as a namespace.
+'use strict'
+const util = {};
+///////////////////////////////////////////////////////////////////////////////
+///
+/// A class full of static utility methods.
+///
+util.Util = class Util {
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Return the sum of a numeric array.
+  ///
+  static sum (arr) {
+    if (arr.length == 0) {return 0;} // edge case
+    let result = 0.0;
+    arr.forEach(function(item) {
+      result += item;
+    });
+    return result;
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Returns the mean of the array, arr.
+  ///
+  static mean (arr) {
+    if (arr.length == 0) {throw RangeError("Can not calculate mean of empty array.");}
+    let result = Util.sum(arr) / arr.length;
+    return result;
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Returns the standard deviation of arr.
+  ///
+  static stdev (arr) {
+    if (arr.length == 0) {throw RangeError("Can not calculate stdev of empty array.");}
+    let m = Util.mean(arr);
+    let result = 0.0;
+    arr.forEach(function(item){
+      result += Math.abs(item - m);
+    });
+    result /= arr.length;
+    return result;
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Returns the standard error of the mean of arr
+  ///
+  static std_error_of_the_mean (arr) {
+    if (arr.length == 0) {throw RangeError("Can not calculate standard error of the mean of empty array.");}
+    let result = Util.stdev(arr) / Math.sqrt(arr.length);
+    return result;
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Returns a integer pseudo-randomly drawn from the range [min, max) or
+  /// [min, max]
+  ///
+  static gen_random_int (min, max, inclusive=false) {
+    if (inclusive == false){
+      return Math.floor(Math.random() * (max-min)) + min;
+    } else {
+      return Math.floor(Math.random() * (max-min+1)) + min;
+    }
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Returns a float pseudo-randomly drawn from the range [min, max) or
+  /// [min, max]
+  ///
+  static gen_random_float (min, max, inclusive=false) {
+    if (inclusive == false){
+      return Math.random() * (max-min) + min;
+    } else {
+      return Math.random() * (max-min+1) + min;
+    }
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Randomly shuffles the array, arr, in-place using the Fisher-Yates
+  /// algorithm. Note the original array (not a copy) is modified.
+  ///
+  static fisher_yates_shuffle (arr) {
+    let j = undefined;
+    let k = undefined;
+    for (let i = arr.length-1; i >=0; i--){
+      j = Util.gen_random_int(0,i,true);
+      k = arr[j];
+      arr[j] = arr[i];
+      arr[i] = k;
+    }
+    return arr;
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Tries to determin if the current window object is associated with the
+  /// main browser window or a iframe window.  Returns true if it looks like an
+  /// iframe.
+  ///
+  static window_is_iframe() {
+    try{
+      return window.self !== window.top;
+    } catch(err) {
+      return true;
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Plays a beep audio sound.
+  ///
+  static play_beep_sound() {
+    var snd = new Audio("data:audio/wav;base64,//uQRAAAAWMSLwUIYAAsYkXgoQwAEaYLWfkWgAI0wWs/ItAAAGDgYtAgAyN+QWaAAihwMWm4G8QQRDiMcCBcH3Cc+CDv/7xA4Tvh9Rz/y8QADBwMWgQAZG/ILNAARQ4GLTcDeIIIhxGOBAuD7hOfBB3/94gcJ3w+o5/5eIAIAAAVwWgQAVQ2ORaIQwEMAJiDg95G4nQL7mQVWI6GwRcfsZAcsKkJvxgxEjzFUgfHoSQ9Qq7KNwqHwuB13MA4a1q/DmBrHgPcmjiGoh//EwC5nGPEmS4RcfkVKOhJf+WOgoxJclFz3kgn//dBA+ya1GhurNn8zb//9NNutNuhz31f////9vt///z+IdAEAAAK4LQIAKobHItEIYCGAExBwe8jcToF9zIKrEdDYIuP2MgOWFSE34wYiR5iqQPj0JIeoVdlG4VD4XA67mAcNa1fhzA1jwHuTRxDUQ//iYBczjHiTJcIuPyKlHQkv/LHQUYkuSi57yQT//uggfZNajQ3Vmz+Zt//+mm3Wm3Q576v////+32///5/EOgAAADVghQAAAAA//uQZAUAB1WI0PZugAAAAAoQwAAAEk3nRd2qAAAAACiDgAAAAAAABCqEEQRLCgwpBGMlJkIz8jKhGvj4k6jzRnqasNKIeoh5gI7BJaC1A1AoNBjJgbyApVS4IDlZgDU5WUAxEKDNmmALHzZp0Fkz1FMTmGFl1FMEyodIavcCAUHDWrKAIA4aa2oCgILEBupZgHvAhEBcZ6joQBxS76AgccrFlczBvKLC0QI2cBoCFvfTDAo7eoOQInqDPBtvrDEZBNYN5xwNwxQRfw8ZQ5wQVLvO8OYU+mHvFLlDh05Mdg7BT6YrRPpCBznMB2r//xKJjyyOh+cImr2/4doscwD6neZjuZR4AgAABYAAAABy1xcdQtxYBYYZdifkUDgzzXaXn98Z0oi9ILU5mBjFANmRwlVJ3/6jYDAmxaiDG3/6xjQQCCKkRb/6kg/wW+kSJ5//rLobkLSiKmqP/0ikJuDaSaSf/6JiLYLEYnW/+kXg1WRVJL/9EmQ1YZIsv/6Qzwy5qk7/+tEU0nkls3/zIUMPKNX/6yZLf+kFgAfgGyLFAUwY//uQZAUABcd5UiNPVXAAAApAAAAAE0VZQKw9ISAAACgAAAAAVQIygIElVrFkBS+Jhi+EAuu+lKAkYUEIsmEAEoMeDmCETMvfSHTGkF5RWH7kz/ESHWPAq/kcCRhqBtMdokPdM7vil7RG98A2sc7zO6ZvTdM7pmOUAZTnJW+NXxqmd41dqJ6mLTXxrPpnV8avaIf5SvL7pndPvPpndJR9Kuu8fePvuiuhorgWjp7Mf/PRjxcFCPDkW31srioCExivv9lcwKEaHsf/7ow2Fl1T/9RkXgEhYElAoCLFtMArxwivDJJ+bR1HTKJdlEoTELCIqgEwVGSQ+hIm0NbK8WXcTEI0UPoa2NbG4y2K00JEWbZavJXkYaqo9CRHS55FcZTjKEk3NKoCYUnSQ0rWxrZbFKbKIhOKPZe1cJKzZSaQrIyULHDZmV5K4xySsDRKWOruanGtjLJXFEmwaIbDLX0hIPBUQPVFVkQkDoUNfSoDgQGKPekoxeGzA4DUvnn4bxzcZrtJyipKfPNy5w+9lnXwgqsiyHNeSVpemw4bWb9psYeq//uQZBoABQt4yMVxYAIAAAkQoAAAHvYpL5m6AAgAACXDAAAAD59jblTirQe9upFsmZbpMudy7Lz1X1DYsxOOSWpfPqNX2WqktK0DMvuGwlbNj44TleLPQ+Gsfb+GOWOKJoIrWb3cIMeeON6lz2umTqMXV8Mj30yWPpjoSa9ujK8SyeJP5y5mOW1D6hvLepeveEAEDo0mgCRClOEgANv3B9a6fikgUSu/DmAMATrGx7nng5p5iimPNZsfQLYB2sDLIkzRKZOHGAaUyDcpFBSLG9MCQALgAIgQs2YunOszLSAyQYPVC2YdGGeHD2dTdJk1pAHGAWDjnkcLKFymS3RQZTInzySoBwMG0QueC3gMsCEYxUqlrcxK6k1LQQcsmyYeQPdC2YfuGPASCBkcVMQQqpVJshui1tkXQJQV0OXGAZMXSOEEBRirXbVRQW7ugq7IM7rPWSZyDlM3IuNEkxzCOJ0ny2ThNkyRai1b6ev//3dzNGzNb//4uAvHT5sURcZCFcuKLhOFs8mLAAEAt4UWAAIABAAAAAB4qbHo0tIjVkUU//uQZAwABfSFz3ZqQAAAAAngwAAAE1HjMp2qAAAAACZDgAAAD5UkTE1UgZEUExqYynN1qZvqIOREEFmBcJQkwdxiFtw0qEOkGYfRDifBui9MQg4QAHAqWtAWHoCxu1Yf4VfWLPIM2mHDFsbQEVGwyqQoQcwnfHeIkNt9YnkiaS1oizycqJrx4KOQjahZxWbcZgztj2c49nKmkId44S71j0c8eV9yDK6uPRzx5X18eDvjvQ6yKo9ZSS6l//8elePK/Lf//IInrOF/FvDoADYAGBMGb7FtErm5MXMlmPAJQVgWta7Zx2go+8xJ0UiCb8LHHdftWyLJE0QIAIsI+UbXu67dZMjmgDGCGl1H+vpF4NSDckSIkk7Vd+sxEhBQMRU8j/12UIRhzSaUdQ+rQU5kGeFxm+hb1oh6pWWmv3uvmReDl0UnvtapVaIzo1jZbf/pD6ElLqSX+rUmOQNpJFa/r+sa4e/pBlAABoAAAAA3CUgShLdGIxsY7AUABPRrgCABdDuQ5GC7DqPQCgbbJUAoRSUj+NIEig0YfyWUho1VBBBA//uQZB4ABZx5zfMakeAAAAmwAAAAF5F3P0w9GtAAACfAAAAAwLhMDmAYWMgVEG1U0FIGCBgXBXAtfMH10000EEEEEECUBYln03TTTdNBDZopopYvrTTdNa325mImNg3TTPV9q3pmY0xoO6bv3r00y+IDGid/9aaaZTGMuj9mpu9Mpio1dXrr5HERTZSmqU36A3CumzN/9Robv/Xx4v9ijkSRSNLQhAWumap82WRSBUqXStV/YcS+XVLnSS+WLDroqArFkMEsAS+eWmrUzrO0oEmE40RlMZ5+ODIkAyKAGUwZ3mVKmcamcJnMW26MRPgUw6j+LkhyHGVGYjSUUKNpuJUQoOIAyDvEyG8S5yfK6dhZc0Tx1KI/gviKL6qvvFs1+bWtaz58uUNnryq6kt5RzOCkPWlVqVX2a/EEBUdU1KrXLf40GoiiFXK///qpoiDXrOgqDR38JB0bw7SoL+ZB9o1RCkQjQ2CBYZKd/+VJxZRRZlqSkKiws0WFxUyCwsKiMy7hUVFhIaCrNQsKkTIsLivwKKigsj8XYlwt/WKi2N4d//uQRCSAAjURNIHpMZBGYiaQPSYyAAABLAAAAAAAACWAAAAApUF/Mg+0aohSIRobBAsMlO//Kk4soosy1JSFRYWaLC4qZBYWFRGZdwqKiwkNBVmoWFSJkWFxX4FFRQWR+LsS4W/rFRb/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////VEFHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU291bmRib3kuZGUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMjAwNGh0dHA6Ly93d3cuc291bmRib3kuZGUAAAAAAAAAACU=");  
+    snd.play();
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Returns today's date as a string
+  ///
+  static today() {
+    let today = new Date();
+    let dd = String(today.getDate()).padStart(2, '0');
+    let mm = String(today.getMonth() + 1).padStart(2, '0');
+    let yyyy = String(today.getFullYear());
+    return yyyy + '-' + mm + '-' + dd;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Sets a cookie. Uses btoa to mangle the key.
+  ///
+  /// Credit: https://www.w3schools.com/js/js_cookies.asp
+  ///
+  static set_cookie(key, value, expires_in_N_days) {
+    let d = new Date();
+    d.setTime(d.getTime() + (expires_in_N_days*24*60*60*1000));
+    let expires = "expires=" + d.toGMTString();
+    document.cookie = btoa(key) + "=" + value + ";" + expires + ";path=/";
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Retrieves a cookie. Uses btoa to un-mangle the key.
+  ///
+  /// Credit: https://www.w3schools.com/js/js_cookies.asp
+  ///
+  static get_cookie(key) {
+    key = btoa(key) + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for(let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(key) == 0) {
+        return c.substring(key.length, c.length);
+      }
+    }
+    return "";
+  }
+
+}
+///////////////////////////////////////////////////////////////////////////////
+///
+/// Simple implementation of a "Signals and Slots" callback system.
+///
+util.Signal = class {
+  constructor () {
+    this._connected_slots = [];
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Use to connect a callback to this signal.
+  ///
+  connect (new_slot) {
+    this._connected_slots.push(new_slot);
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Use to call all callbacks connected to this signal.
+  ///
+  emit () {
+    for (let i = 0; i < this._connected_slots.length; i++) {
+      this._connected_slots[i].apply(null, arguments);
+    }
+  }
+}
+///////////////////////////////////////////////////////////////////////////////
+///
+/// A KeyFilter is a wrapper class for a keypress EventListener.
+///
+/// Example usage:
+/// ...
+/// let myKeyFilter = new KeyFilter( myCallback );
+/// myKeyFilter.turn_on()
+/// // When user presses "any" key
+/// // myKeyFilter will immediately call myCallback("any")
+/// ...
+/// myKeyFilter.turn_off()
+/// // User presses "any" key
+/// // nothing happens
+/// ...
+/// myKeyFilter = myKeyFilter.destroy() // will remove the event listener and
+///                                     // sets myKeyFilter to undefined.
+///
+util.KeyFilter = class {
+  constructor ( on_keypress_callback, key_filter_on=true ) {
+    this._key_filter_on = key_filter_on; /// enable or disable this KeyFilter.
+    this._callback = on_keypress_callback;  /// This method is called whenever a key is pressed if the logger is on.
+    this.bound_callback = this._catch_keypress.bind(this);
+    window.addEventListener('keypress', this.bound_callback);  /// adds a listener for key presses.
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Turn this filter ON.
+  ///
+  turn_on () {
+    this._key_filter_on = true;
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Turn this filter OFF.
+  ///
+  turn_off () {
+    this._key_filter_on = false;
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Private method to be triggered from the EventListener. It will call the
+  /// callback on a keypress event if the KeyFiler is on.  This function
+  /// forwards the key identity (i.e. "a" "b" "c") to the callback as an
+  /// argument.
+  ///
+  _catch_keypress (key_num) {
+    if (this._key_filter_on == true){
+      this._callback(key_num.key);
+    }
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// This method cleans up the class when the client is done with it.
+  ///
+  destroy () {
+    window.removeEventListener("keypress", this.bound_callback);
+    return undefined;
+  }
+}
+// Taken from https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
+// in 2018.
+
+///////////////////////////////////////////////////////////////////////////////
+///
+/// A utility class for hash functions.
+///
+util.Hash = class Hash {
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Convert an arraybuffer into a hex number
+  ///
+  static _hex (buffer) {
+    var hexCodes = [];
+    var view = new DataView(buffer);
+    for (var i = 0; i < view.byteLength; i += 4) {
+      // Using getUint32 reduces the number of iterations needed (we process 4 bytes each time)
+      var value = view.getUint32(i)
+      // toString(16) will give the hex representation of the number without padding
+      var stringValue = value.toString(16)
+      // We use concatenation and slice for padding
+      var padding = '00000000'
+      var paddedValue = (padding + stringValue).slice(-padding.length)
+      hexCodes.push(paddedValue);
+    }
+
+    // Join all the hex strings into one
+    return hexCodes.join("");
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Apply the sha256 hash function on a string input
+  ///
+  static sha256 (str) {
+    // We transform the string into an arraybuffer.
+    let buffer = new TextEncoder("utf-8").encode(str);
+    let result = {};
+    crypto.subtle.digest("SHA-256", buffer).then(function (hash) {
+      result.hash = Hash._hex(hash); // unload from the Promise object
+    });
+    return result;
+  }
+}
+///////////////////////////////////////////////////////////////////////////////
+///
+/// <ExperimentBase> is the base class for Experiemnts. It can be filled with
+/// <Steps> and then ran.
+///
+/// Example usage:
+/// ...
+/// let ex = new Experiment();
+/// ex.add_new_step( someStep );
+/// ex.add_new_step( anotherStep );
+/// ex.run();
+///
+util.ExperimentBase = class {
+  constructor (version) {
+    this._steps = []; // an array of the experiment steps
+    this._steps_finalized = false; // private flag for signaling initialization
+    this._db = new util.Database();
+    this._db._acvs_version = "version_" + String(version);
+    this._run_date = util.Util.today();
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Adds a new step to the Experiment
+  ///
+  add_new_step (new_step) {
+    if ( !(new_step instanceof util.AbstractStep) ) {
+      throw "Error: argument must be derived from AbstractStep"
+    }
+    if (this._steps_finalized == true) {
+      throw "Error: Cannot append a new step after the experiemnt has started";
+    }
+    new_step.step_completed_signal.connect( this._execute_next_step.bind(this) );
+    this._steps.push(new_step);
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Starts the Experiment
+  ///
+  run () {
+    this._stepsFinalized = true;
+    this._execute_next_step();
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Executes the next step in the experiment each time it is called. Does
+  /// nothing if there are no more steps.
+  ///
+  _execute_next_step () {
+    let queuedStep = this._steps.shift();
+    if (queuedStep != undefined) {
+      queuedStep.execute();
+    }
+  }
+}
+///////////////////////////////////////////////////////////////////////////////
+///
+/// <AbstractStep> defines a common interface to be used by all derived
+/// Step objects.
+///
+util.AbstractStep = class {
+  constructor () {
+    // all derived classes should emit() this Signal at the end of their
+    // overridden execute() method.
+    this.step_completed_signal = new util.Signal();
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// The main routine called to start this step.
+  ///
+  execute()  {
+    throw "Error: Abstract method called";
+  }
+}
+///////////////////////////////////////////////////////////////////////////////
+///
+/// An abstraction for a database-like object containing tables of records.
+///
+/// db = new Database();
+/// db.add_new_table("table1");
+/// db.table1.add_new_column("col1");
+/// db.table1.add_new_column("col2");
+/// db.table1.add_new_column("col3");
+///
+/// db.finalize(); // lock structure
+///
+/// db.table1.add_new_row(valA1, valB1, valC1);
+/// db.table1.add_new_row(valA2, valB2, valC2);
+///
+/// console.log(db);
+/// >> {table1: {col1:         [valA1,     valA2   ],
+///              col2:         [valB1,     valB2   ],
+///              col3:         [valC1,     valC2   ],
+///              rowIndex:     [1,         2       ],
+///              rowTimestamp: [0.1231..., 0.231...] } }
+///
+util.Database = class {
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Called on instantiation.
+  ///
+  constructor () {
+    // timestamp for when this object was created
+    this._time_instantiated = performance.now();
+    // an array containing the names of the tables in this db
+    this._array_of_table_names = [];
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Add a new table to this db.
+  ///
+  add_new_table (table_name) {
+    // record the new table's name
+    this._array_of_table_names.push(table_name);
+    // create the new table
+    this[table_name] = new util.Table(this._time_instantiated);
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Call this method after all tables have been added to lock the structure
+  /// of the db.
+  ///
+  finalize () {
+    // call finalize on all tables in the db
+    for (let i = 0; i < this._array_of_table_names.length; i++) {
+      this[this._array_of_table_names[i]].finalize();
+    }
+    // delete the methods that can be used to modify the structure of the db
+    delete this.add_new_table;
+    delete this.finalize;
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+///
+/// An abstraction for a database table.
+///
+util.Table = class {
+  constructor (absolute_timestamp) {
+    // initial timestamp for use in all subsequent timestamps:
+    this._absolute_timestamp = absolute_timestamp;
+    // for internal bookkeeping:
+    this._array_of_column_names = [];
+    // automatically populated columns:
+    this["RowTimestamp"] = [];
+    this["RowIndex"] = [];
+    this["RowHash"] = [];
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Return the number of rows in this table or 0 if the table has no columns.
+  ///
+  number_of_rows () {
+    if (this._array_of_column_names.length == 0) {
+      return 0;
+    } else {
+      return this[this._array_of_column_names[0]].length;
+    }
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Append a new column to the table.
+  ///
+  add_new_column (column_name) {
+    // record the column name
+    this._array_of_column_names.push(column_name);
+    // create an empty array to represent the column
+    this[column_name] = [];
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Append a new row/record to this table.
+  ///
+  add_new_row () {
+    // automatically timestamp when this row is added
+    this["RowTimestamp"].push(performance.now() - this._absolute_timestamp);
+    // automatically add an index number for this row
+    this["RowIndex"].push(this[this._array_of_column_names[0]].length + 1);
+    // automatically add a hash of the previous row
+    let num_rows = this.number_of_rows();
+    if (num_rows > 0) {
+      let previous_row_as_string = JSON.stringify(this.get_row(num_rows - 1));
+      this["RowHash"].push(util.Hash.sha256(previous_row_as_string))
+    } else {
+      this["RowHash"].push("init")
+    }
+    // add the arguments given to this function as elements for the row
+    for (let i = 0; i < this._array_of_column_names.length; i++) {
+      this[this._array_of_column_names[i]].push(arguments[i]);
+    }
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Return an array containing the contents of the table at row_index.
+  /// Note: primitives are likely returned *by-copy* and objects *by-reference*
+  /// within the new array.
+  ///
+  get_row (row_index) {
+    let result = [];
+    result.push(this["RowTimestamp"][row_index]);
+    result.push(this["RowIndex"][row_index]);
+    result.push(this["RowHash"][row_index]);
+    for (let i = 0; i < this._array_of_column_names.length; i++) {
+      result.push(this[this._array_of_column_names[i]][row_index]);
+    }
+    return result;
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Call to lock the structure of this table by deleting the mutator methods.
+  ///
+  finalize () {
+    delete this.add_new_column;
+    delete this.finalize;
+  }
+}
+// Define an objection which will act as a namespace.
+'use strict'
+const exp = {};
+/// <ChartSquare> is a datastructure holding the info to describe a square on
+/// the chart
+class ChartSquare {
+  constructor( digit, color ) {
+    let _this = this;
+    _this.digit = digit;
+    _this.color = color;
+
+  }
+}
+
+/// <ChartDataset> is a collection of <ChartSquare> organizing them into the
+/// three rings and storing the two target digits.
+class ChartDataset {
+  constructor( optTargDigit, nonOptTargDigit, innerRingSquares,
+      middleRingSquares, outerRingSquares, optTargPos,
+      nonOptTargPos, optColorIndex, nonOptColorIndex, distColorIndex) {
+    let _this = this;
+    _this.optTargDigit = optTargDigit;
+    _this.optTargPos = optTargPos;
+    _this.nonOptTargDigit = nonOptTargDigit;
+    _this.nonOptTargPos = nonOptTargPos;
+    _this.innerRingSquares  = innerRingSquares;
+    _this.middleRingSquares = middleRingSquares;
+    _this.outerRingSquares  = outerRingSquares;
+    _this.optColorIndex = optColorIndex;
+    _this.nonOptColorIndex = nonOptColorIndex;
+    _this.distColorIndex = distColorIndex;
+  }
+}
+///////////////////////////////////////////////////////////////////////////////
+///
+/// <ChartDatasetGenerator> is a generator object that yields the next
+/// <ChartDataset> for each trial in a block of trials.  This generator will
+/// return *null* when exhausted.
+///
+/// This generator follows the following randomization scheme:
+/// ==========================================================
+///
+/// ChartDataset-type-1 has (27 blue, 13 red, 14 green) squares
+/// ChartDataset-type-2 has (13 blue, 27 red, 14 green) squares
+///
+/// The generator will yeild 42 <ChartDataset>'s before exhausting.
+/// half type-1, half type-2
+///
+/// There will be "runs" of type-1 or type-2, between 1-6 in a row.
+/// For each type, there will be 1 runs of each length.
+///
+/// The "runs" and "types" will be presented in uniform random order.
+///
+/// For each chart the two target digits will be selected at random.
+///
+/// In summary: (1+2+3+4+5+6 runs) * (1 reps) * (2 types) = 42 trials
+///
+exp.ChartDatasetGenerator = class {
+  constructor () {
+    this.normalDigits = [ 6, 7, 8, 9 ];
+    this.targetDigits = [ 2, 3, 4, 5 ];
+    this.colors = [ "rgb(188, 0, 188)"
+                 , "rgb(95, 158, 160)"
+                 , "rgb(97, 97, 97)" ];
+
+    this.finalList = this._make_block_dataset(this._generate_trial_conditions());
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// WL: helper function: generate trialconds matrix analgous to jesir's code
+  /// WL: However, with the limitation of trials, non-optimal target digit
+  /// cannot be crossed with other variables. It is balanced.
+  _generate_trial_conditions () {
+      let trialConds = [];
+      for (let optColor = 0; optColor < 3; optColor++) {
+        for (let ecc1 = 1; ecc1 < 4; ecc1++) {
+              for (let ecc2 = 1; ecc2 < 4; ecc2++) {
+                  for (let d1 = 2; d1 < 6; d1++) {
+                      let nonOptColor = this._select_rand_from_array([0, 1, 2], optColor);
+                      let d2 = this._select_rand_from_array(this.targetDigits, d1);
+                        trialConds.push([optColor, nonOptColor, ecc1, ecc2, d1, d2]);
+                  }
+              }
+          }
+      }
+      return util.Util.fisher_yates_shuffle(trialConds);
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// helper function: copy a random item from array.
+  ///
+  _select_rand_from_array (array, exclude=null) {
+    let rand_index = util.Util.gen_random_int(0, array.length);
+    let rand_digit = array[rand_index];
+    if (rand_digit === exclude){
+      return this._select_rand_from_array(array, exclude);
+    }
+    return rand_digit;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// helper function: make a random ChartDataset of "type"
+  ///
+  ///
+  /// WL: This is just to generate a single trial of "type" blue or red.
+  /// WL: Amendment. Not only type, but also eccentricity, target digits, should
+  /// be taken into consideration.
+  /// Parameter
+  ///   optColor: 0-2
+  ///   nonOptColor: 0-2
+  _make_chartDataset (optColor, nonOptColor, optEcc, nonOptEcc, optDigit, nonOptDigit) {
+    // pick targets
+//    let redTarget = this._select_rand_from_array(this.targetDigits);
+//    let blueTarget = this._select_rand_from_array(this.targetDigits, redTarget);
+    let distColor = 0;
+    for (distColor = 0; distColor < 3; distColor++) {
+        if (distColor != optColor && distColor != nonOptColor) {break;}
+    }
+
+    // prepare all squares
+    // first add distractor squares
+    let distSquares = [];
+
+    for (let i = 0; i < 18; i++) {
+        distSquares.push(new ChartSquare(this._select_rand_from_array(this.normalDigits), this.colors[distColor]));
+    }
+
+    for (let i = 0; i < 17; i++) {
+        distSquares.push(new ChartSquare(this._select_rand_from_array(this.normalDigits), this.colors[optColor]));
+    }
+
+    for (let i = 0; i < 17; i++) {
+        distSquares.push(new ChartSquare(this._select_rand_from_array(this.normalDigits), this.colors[nonOptColor]));
+    }
+
+    distSquares = util.Util.fisher_yates_shuffle(distSquares);
+
+    let outerRing = [];
+    let middleRing = [];
+    let innerRing = [];
+
+    switch (optEcc) {
+        case 1:
+            innerRing.push(new ChartSquare(optDigit, this.colors[optColor]));
+            break;
+        case 2:
+            middleRing.push(new ChartSquare(optDigit, this.colors[optColor]));
+            break;
+        case 3:
+            outerRing.push(new ChartSquare(optDigit, this.colors[optColor]));
+    }
+
+    switch (nonOptEcc) {
+        case 1:
+            innerRing.push(new ChartSquare(nonOptDigit, this.colors[nonOptColor]));
+            break;
+        case 2:
+            middleRing.push(new ChartSquare(nonOptDigit, this.colors[nonOptColor]));
+            break;
+        case 3:
+            outerRing.push(new ChartSquare(nonOptDigit, this.colors[nonOptColor]));
+    }
+
+    while (innerRing.length < 12) {
+        innerRing.push(distSquares.pop());
+    }
+    while (middleRing.length < 18) {
+        middleRing.push(distSquares.pop());
+    }
+    while (outerRing.length < 24) {
+        outerRing.push(distSquares.pop());
+    }
+
+    innerRing = util.Util.fisher_yates_shuffle(innerRing);
+    middleRing = util.Util.fisher_yates_shuffle(middleRing);
+    outerRing = util.Util.fisher_yates_shuffle(outerRing);
+
+    let allSquares = innerRing.concat(middleRing.concat(outerRing));
+
+    let redTargetDigitPos = -1;
+    let blueTargetDigitPos = -1;
+    for (let i=0; i < allSquares.length; i++) {
+      if (allSquares[i].digit == optDigit && allSquares[i].color == this.colors[optColor]) {
+        redTargetDigitPos = i;
+      }
+      if (allSquares[i].digit == nonOptDigit && allSquares[i].color == this.colors[nonOptColor]) {
+        blueTargetDigitPos = i;
+      }
+    }
+
+    return new ChartDataset(optDigit, nonOptDigit, innerRing, middleRing,
+        outerRing, redTargetDigitPos, blueTargetDigitPos, optColor, nonOptColor, distColor);
+  }
+
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// WL: Return a whole 108 trials of a block.
+  _make_block_dataset(trialConds) {
+      let finalList = [];
+      let currentTrialCond;
+      while (trialConds.length > 0) {
+          currentTrialCond = trialConds.pop();
+          let optColor = currentTrialCond[0];
+          let nonOptColor = currentTrialCond[1];
+          let optEcc = currentTrialCond[2];
+          let nonOptEcc = currentTrialCond[3];
+          let optDigit = currentTrialCond[4];
+          let nonOptDigit = currentTrialCond[5];
+          finalList.push(this._make_chartDataset(optColor, nonOptColor, optEcc, nonOptEcc, optDigit, nonOptDigit));
+      }
+      console.log(finalList);
+      return finalList;
+  }
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Return the next <ChartDataset> for the block.  Will return null when
+  /// exhausted of datasets.
+  ///
+  /// WL: Yield, or pop the next <ChartDataset> in this <ChartDatasetGenerator>.
+  yield_chartDataset () {
+    if (this.finalList.length > 98) {
+        console.log(this.finalList[this.finalList.length-1]);
+        return this.finalList.pop();
+    } else {
+        return null;
+    }
+  }
+}
+///////////////////////////////////////////////////////////////////////////////
+///
+/// The ChartWidget class encapsulates the logic for the visual graphic
+/// shown to the user.
+///
+exp.ChartWidget = class {
+  constructor(parent_element) {
+    this.parent_element = parent_element;  // this is where the graphic will be drawn.
+    this.ring_radius = 0;
+    this.square_size = 0;
+    this.cross_color = 0;
+    this.data = 0;  // a <ChartDataset> is passed here
+    this.square_colors = 0;
+    window.addEventListener("resize", this.show.bind(this));  // redraw the graphic if the window resizes.
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// This method can be called to "destroy" the this object.
+  ///
+  destroy() {
+    this.parent_element.selectAll(".ace_svg_container").data([]).exit().remove();
+    window.removeEventListener("resize", this.show.bind(this));
+    return undefined;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// This method will clear the squares from the graphic, the cross will
+  /// remain.
+  ///
+  clear() {
+    this.parent_element.selectAll("text").data([]).exit().remove();
+    this.parent_element.selectAll("rect").data([]).exit().remove();
+    this.parent_element.selectAll("circle").data([]).exit().remove();
+    this.parent_element.selectAll("line").data([]).exit().remove();
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// This method clears the squares from the graphic, if the arguement
+  /// text is not "undefined" or "null" then, the cross will be replaced
+  /// with "text".
+  ///
+  clear_and_show_text(text) {
+    this.clear();
+    if (text != undefined && text != null) {
+
+      let data = [{}]
+      d3.select("svg").selectAll("text").data([{}]).enter().append("text")
+        .attr("x", 38 * .9 + this.square_size/2 + "")
+        .attr("y", 52 * .9 + this.square_size/2 + "")
+        .attr("class","ace_pretty_text")
+        .attr("font-size", this.square_size*1.5+"")
+        .text(text)
+        .exit().remove();
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// A setter method.
+  ///
+  set_ring_radius(radius) { this.ring_radius = radius; }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// A setter method.
+  ///
+  set_square_size(size) { this.square_size = size; }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// A setter method.
+  ///
+  set_cross_color(color) { this.cross_color = color; }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// A setter method.
+  ///
+  set_data(data) { this.data = data; }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// WL: A setter method.
+  ///
+  set_square_colors(colors) { this.square_colors = colors; }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// When called this method will display the graphic to the client.
+  ///
+  show_cross_only() {
+    this.clear();
+    let svg;
+    { // create the svg element for D3 to work with:
+      let div = this.parent_element.selectAll("div").data([1]);
+      div.enter().append("div")
+        .attr("class", "ace_svg_container")
+        .append("svg")
+        .attr("viewBox", "0 0 100 100")
+        .attr("preserveAspectRatio", "xMinYMin meet")
+        .attr("class", "ace_svg_content_responsive");
+      div.exit().remove();
+      svg = d3.select("svg");
+    }
+
+    { // draw the cross:
+      let a = this.square_size / 2;
+      let line1 = {
+        x1: 49 * .9 + a + "", x2: 51 * .9 + a + "",
+        y1: 50 * .9 + a + "", y2: 50 * .9 + a + "",
+        sw: .2, c: this.cross_color
+      };
+
+      let line2 = {
+        y1: 49 * .9 + a + "", y2: 51 * .9 + a + "",
+        x1: 50 * .9 + a + "", x2: 50 * .9 + a + "",
+        sw: .2, c: this.cross_color
+      };
+
+      let cross = svg.selectAll("line").data([line1, line2]);
+      cross.attr("x1", function (d) { return d.x1; })
+        .attr("x2", function (d) { return d.x2; })
+        .attr("y1", function (d) { return d.y1; })
+        .attr("y2", function (d) { return d.y2; })
+        .attr("stroke", function (d) { return d.c; })
+        .attr("stroke-width", function (d) { return d.sw; });
+      cross.enter().append("line")
+        .attr("x1", function (d) { return d.x1; })
+        .attr("x2", function (d) { return d.x2; })
+        .attr("y1", function (d) { return d.y1; })
+        .attr("y2", function (d) { return d.y2; })
+        .attr("stroke", function (d) { return d.c; })
+        .attr("stroke-width", function (d) { return d.sw; });
+      cross.exit().remove();
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// When called this method will display the graphic to the client.
+  ///
+  show() {
+    let svg;
+    let a = this.square_size / 2; // I still don't know what "a" means
+    { // create the svg element for D3 to work with:
+      let div = this.parent_element.selectAll("div").data([1]);
+      div.enter().append("div")
+        .attr("class", "ace_svg_container")
+        .append("svg")
+        .attr("viewBox", "0 0 100 100")
+        .attr("preserveAspectRatio", "xMinYMin meet")
+        .attr("class", "ace_svg_content_responsive");
+      div.exit().remove();
+      svg = d3.select("svg");
+    }
+
+    { // draw the cue
+
+
+
+      class Circle {
+        constructor(cx, cy, r, fill, stroke=null, sw=null) {
+          this.cx = cx;
+          this.cy = cy;
+          this.r = r;
+          this.fill = fill;
+          this.stroke = stroke;
+          this.sw = sw;
+        }
+      }
+      function generate_data_for_the_cue(squareSize, allColor, optColorIndex, nonOptColorIndex, distColorIndex) {
+        let result = [];
+        let x = [50*.9+a-.5*a+"", 50*.9+a+"", 50*.9+a+.5*a+""]; // left, center, right
+        let y = [50*.9+a-.5*a+"", 50*.9+a+"", 50*.9+a+.5*a+""]; // up, center, down
+        // create a circle outline
+        result.push(new Circle(x[1], y[1], squareSize/1.5+"", null, "white", ".1"));
+        if (Math.random() < .5) {
+          result.push(new Circle(x[1], y[0], ".5", allColor[optColorIndex])); // optimal cue up center
+          if (Math.random() < .5) {
+            result.push(new Circle(x[0], y[2], ".5", allColor[nonOptColorIndex])); // down left
+            result.push(new Circle(x[2], y[2], ".5", allColor[distColorIndex])); // down right
+          } else {
+            result.push(new Circle(x[2], y[2], ".5", allColor[nonOptColorIndex])); // down right
+            result.push(new Circle(x[0], y[2], ".5", allColor[distColorIndex])); // down left
+          }
+        }
+        else {
+          result.push(new Circle(x[1], y[2], ".5", allColor[optColorIndex])); // optimal cue down center
+          if (Math.random() < .5) {
+            result.push(new Circle(x[0], y[0], ".5", allColor[nonOptColorIndex])); // up left
+            result.push(new Circle(x[2], y[0], ".5", allColor[distColorIndex])); // up right
+          } else {
+            result.push(new Circle(x[2], y[0], ".5", allColor[nonOptColorIndex])); // up right
+            result.push(new Circle(x[0], y[0], ".5", allColor[distColorIndex])); // up left
+          }
+        }
+        return result;
+      }
+
+      let data = generate_data_for_the_cue(this.square_size, this.square_colors, this.data.optColorIndex,
+        this.data.nonOptColorIndex, this.data.distColorIndex);
+
+      let circles = svg.selectAll("circle").data(data);
+      circles.enter().append("circle")
+        .attr("cx", function(d) { return d.cx})
+        .attr("cy", function(d) { return d.cy})
+        .attr("r", function(d) { return d.r})
+        .attr("fill", function(d) { return d.fill})
+        .attr("stroke", function(d) { return d.stroke })
+        .attr("stroke-width", function(d) { return d.sw});
+
+      // create a horizontal line
+      let radius = this.square_size/1.5;
+      let line = {
+        x1: 50 * .9 + a - radius + "", x2: 50 * .9 + a + radius + "",
+        y1: 50 * .9 + a + "", y2: 50 * .9 + a + "",
+        sw: ".1", c: "white"
+      };
+      let cueLine = svg.selectAll("line").data([line]);
+      cueLine
+        .attr("x1", function (d) { return d.x1; })
+        .attr("x2", function (d) { return d.x2; })
+        .attr("y1", function (d) { return d.y1; })
+        .attr("y2", function (d) { return d.y2; })
+        .attr("stroke", function (d) { return d.c; })
+        .attr("stroke-width", function (d) { return d.sw; });
+      cueLine.exit().remove();
+      cueLine.raise();
+    }
+
+    { // draw the squares:
+      // Helper class to represent an svg square.
+      class Square {
+        constructor(fill, x, y, digit, w, h) {
+          this.fill = fill;
+          this.x = x;
+          this.y = y;
+          this.text = digit;
+          this.w = w;
+          this.h = h;
+        }
+      }
+
+      let sz = this.square_size + "";
+      // Helper function to generate/format data for the svg squares in the
+      // graphic.
+      function generate_data_for_all_squares(dataset, radius, cx, cy) {
+        let angle = 2 * Math.PI / dataset.length;
+        let result = []
+        for (let i = 0; i < dataset.length; i++) {
+          let x = (Math.cos(angle * i + Math.PI / 2) * radius + cx) * 0.9;
+          let y = (Math.sin(angle * i + Math.PI / 2) * radius + cy) * 0.9;
+          result.push(new Square(dataset[i].color, x, y, dataset[i].digit, sz, sz));
+        }
+        return result;
+      }//generate_data_for_all_squares
+
+      // Format the data:
+      let r = this.ring_radius;
+      let data = generate_data_for_all_squares(this.data.outerRingSquares, r * 1.00, 50, 50).concat(
+        generate_data_for_all_squares(this.data.middleRingSquares, r * 0.75, 50, 50).concat(
+          generate_data_for_all_squares(this.data.innerRingSquares, r * 0.50, 50, 50)));
+
+      // Draw the rectangles on the screen:
+      let rects = svg.selectAll("rect").data(data);
+      rects.enter().append("rect")
+        .attr("width", function (d) { return d.w })
+        .attr("height", function (d) { return d.h })
+        .attr("x", function (d) { return d.x + "" })
+        .attr("y", function (d) { return d.y + "" })
+        .attr("fill", function (d) { return d.fill });
+      rects.exit().remove();
+
+      // Draw the text on the screen:
+      let text_shift = 0.65;
+      let text = svg.selectAll("text").data(data);
+      text.attr("x", (function (d) { return d.x + this.square_size / 3.25 + "" }).bind(this))
+        .attr("y", (function (d) { return d.y + this.square_size / 1.35 + "" }).bind(this))
+        .attr("fill", "red")
+        .attr("class", "ace_pretty_text")
+        .attr("font-size", this.square_size * text_shift + "")
+        .text(function (d) { return d.text });
+      text.enter().append("text")
+        .attr("x", (function (d) { return d.x + this.square_size / 3.25 + "" }).bind(this))
+        .attr("y", (function (d) { return d.y + this.square_size / 1.35 + "" }).bind(this))
+        .attr("fill", "red")
+        .attr("class", "ace_pretty_text")
+        .attr("font-size", this.square_size * text_shift + "")
+        .text(function (d) { return d.text });
+      text.exit().remove();
+    }
+  }
+}
+///////////////////////////////////////////////////////////////////////////////
+///
+/// <HtmlGui> contains simple high-level helper methods for manipulating the
+/// html representing the user-interface.
+///
+exp.HtmlGui = class HtmlGui {
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Return the main div for the gui
+  ///
+  static guiDiv () {
+    return d3.select('#gui');
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Create and show a header area with the given text
+  ///
+  static show_header (text) {
+    // clear any existing header
+    HtmlGui.clear_header();
+    // add a new header <div>
+    d3.select("body")
+      .insert("div", ":first-child")
+      .attr("class", "ace_header")
+      .attr("id", "headerDiv")
+      .html(text);
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Clear the header area
+  ///
+  static clear_header () {
+    d3.selectAll("#headerDiv").data([]).exit().remove();
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Return a D3 selection of the workspace, assuming it exists
+  ///
+  static workspace () {
+    return d3.select("#workspace");
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Clear the workspace
+  ///
+  static clear_workspace () {
+    // delete any existing workspace <div>
+    d3.select("#workspace").data([]).exit().remove();
+    // add a new workspace <div>
+    HtmlGui.guiDiv().selectAll("div").data([1])
+      .enter().append("div")
+        .attr("id", "workspace")
+        .attr("class", "ace_workspace");
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Inserts text on the window
+  ///
+  static append_paragraphs (html, font_size=1.5) {
+    HtmlGui.workspace().selectAll("p").data(html)
+      .enter().append("p")
+        .style("font-size", String(font_size)+"em")
+        .html(function(d){return d;});
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Inserts an image into the window
+  ///
+  static append_image (img) {
+    img = [img.src];
+    HtmlGui.workspace().selectAll("img").data(img)
+      .enter().append("img")
+        .attr('src', function(d){return d;})
+        .attr('class', "ace_centered_div_content");
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Inserts a button on the window
+  ///
+  static append_button (buttonText, onClickCallback) {
+    let button = HtmlGui.workspace().selectAll("button").data([buttonText])
+      .enter().append("button");
+    button.text(function(d){return d;});
+    button.attr("id", function(d){return d+"_button";});
+    button.on("click", onClickCallback);
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Create and show a message area with the given text
+  ///
+  static show_message (text, color="white") {
+    // clear any existing header
+    HtmlGui.clear_message();
+    // add a new header <div>
+    d3.select("body")
+      .insert("div", ":first-child")
+      .attr("class", "ace_message_area")
+      .attr("id", "messageDiv")
+      .style("color", color)
+      .html(text);
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Clear the message area
+  ///
+  static clear_message () {
+    d3.selectAll("#messageDiv").data([]).exit().remove();
+  }
+}
+///////////////////////////////////////////////////////////////////////////////
+///
+/// The Browser class is used to encapsulate query-able information about
+/// the user's web browser.
+///
+exp.Browser = class {
+  constructor () {
+    this.browser_name = bowser.name;
+    this.browser_info = bowser;
+
+    this.dev_pixel_ratio = window.devicePixelRatio;
+
+    this.raw_screen_height = $(window).height();
+
+    this.raw_screen_width = $(window).width();
+
+    this.screen_height = Math.round(this.dev_pixel_ratio * this.raw_screen_height);
+
+    this.screen_width = Math.round(this.dev_pixel_ratio * this.raw_screen_width);
+  }
+}
+///////////////////////////////////////////////////////////////////////////////
+///
+/// The <BrowserAuditStep> will gather information about the user's
+/// browser and require an acknowledgment from the user to proceed.
+///
+exp.BrowserAuditStep = class extends(util.AbstractStep) {
+  constructor(db) {
+    super();
+    this._db = db
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Override the <AbstractStep> execute method
+  ///
+  execute () {
+    this._db.EventsTable.add_new_row("Checking Browser Step");
+
+    let browser = new exp.Browser();
+    this._db.BrowserInfo = browser;
+
+    // print browser information to the screen
+    let html = [ "<br><br><br><br>",
+                 "<hr>",
+                 '<ul>',
+                 '<li>Welcome to the EAL4 experiment.</li>',
+                 '<li>By proceeding you acknowledge that</li>',
+                 '<li style="margin-left: 2em">you have read and understood the <a target="_blank" href="includes/files/consent_rep_short.pdf">Consent To Participate in Reasearch Form</a>, </li>',
+                 '<li style="margin-left: 2em">you are at least 18 years of age, and </li>',
+                 '<li style="margin-left: 2em">you voluntarily agree to participate in this study.</li></ul>',
+                 '<li>Please be sure to enter your correct OSU Name.# in order to receive REP credit.</li></ul>',
+                 "<hr>"
+               ]
+
+    exp.HtmlGui.clear_workspace();
+    exp.HtmlGui.append_paragraphs(html)
+    // create a button for the user to press to acknowledge data collection
+    let button = exp.HtmlGui.workspace().selectAll("button").data(["I consent to participate in this study"]).enter().append("button");
+    button.text(function(d){return d;});
+    button.attr("style", function(d){return "font-size: 1.5em;";});
+    button.attr("id", function(d){return d;});
+    button.on("click", (function(){
+      this._db.EventsTable.add_new_row("Worker agreed to consent form");
+      let osuId = prompt("Please type your OSU Name.#:", "buckeye.1870");
+      let age = prompt("Please type your age:", "150");
+      let gender = prompt("Please type your gender (Male/Female/Non-binary):", "Female");
+      let msg = "Thank you, [".concat(osuId).concat("]. The experiment is about to start.");
+      alert(msg);
+      this._db._user_data = {
+        osu_id: osuId,
+        self_reported_age: age,
+        self_reported_gender: gender
+      };
+      this.step_completed_signal.emit();
+    }).bind(this))
+    //
+    //
+    // function askForInfo() {
+    //     exp.HtmlGui.clear_workspace();
+    //     let html = [ "<br><br><br><br>",
+    //                  "<hr>",
+    //                  '<ul><li>Please enter your information in the dialog.</li> \
+    //                  <li>Make sure you enter the correct OSU Name.#</li> \
+    //                  <li>in order to receive REP credit!</li></ul>',
+    //                  "<hr>"
+    //                ]
+    //     exp.HtmlGui.append_paragraphs(html);
+    //     let button = exp.HtmlGui.workspace().selectAll("button").data(["Answer questions"]).enter().append("button");
+    //     button.text(function(d){return d;});
+    //     button.attr("style", function(d){return "font-size: 1.5em;";});
+    //     button.attr("id", function(d){return d;});
+    //     button.on("click", (function(){
+    //         let age = prompt("Please type your age:", "0");
+    //         let gender = prompt("Please type your gender (1=M/2=F/3=Other):", "0");
+    //         alert("Thank you!");
+    //     }).bind(this))
+    // }
+  }
+
+}
+///////////////////////////////////////////////////////////////////////////////
+///
+/// <BlockStep> represents a block of <Trial>'s for the user to complete.
+///
+exp.BlockStep = class extends util.AbstractStep {
+  constructor ( db, blocknum ) {
+    super();
+
+    this._db = db;
+    this._blocknum = blocknum;
+
+    // object which generates random datasets for the chart widget
+    this._chart_dataset_generator = new exp.ChartDatasetGenerator();
+
+    // array of 1s & 0s for "correct" & "incorrect" for each trial
+    this._accuracy_data = [];
+
+    // array of all of the data for all for each of the trials
+    this._all_trials_data = [];
+
+    this._trial_num = 1;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// The construction of the trial is separated out into this function so that
+  /// subclasses may override this step.
+  ///
+  _construct_trial (chart_dataset) {
+    // this is a constructor for some exp.AbstractTrial derived subclass
+    return new exp.Trial(chart_dataset);
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Run the next trial of the block until there are no more trials.
+  ///
+  _run_next_trial (previous_results=null) {
+    if (previous_results != null) {
+      this._accuracy_data.push(previous_results.bool);
+      this._all_trials_data.push(previous_results);
+    }
+
+    let chart_dataset = this._chart_dataset_generator.yield_chartDataset();
+
+    if (chart_dataset != null) {
+      // create a new trial
+      let trial = this._construct_trial(chart_dataset);
+      trial._trial_number_in_block = this._trial_num;
+      this._trial_num++;
+      trial._block_number = this._blocknum;
+
+      // when the trial is completed call the next trial (~recursive)
+      trial.trial_completed_signal.connect( this._run_next_trial.bind(this) );
+
+      // start the trial
+      trial.run_trial();
+    } else {
+      // all trials have been completed so tell the user how they did.
+      this._save_data();
+      this._show_summary();
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Record the results after all the trials have been completed.
+  ///
+  _save_data () {
+    this._db.ExperimentTable.add_new_row(this._blocknum, this._all_trials_data);
+    localStorage.setItem(window._acvs_guid, btoa(JSON.stringify(this._db)));
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Show a summary of the block.
+  ///
+  _show_summary () {
+    let paragraph = [];
+    paragraph.push("<br><br><br>");
+    paragraph.push("<b>You Completed Block #" +this._blocknum + "!</b>");
+    paragraph.push("<hr>");
+    paragraph.push("Your Accuracy: " + (Math.round(util.Util.mean(this._accuracy_data) * 1000)/10) + "%");
+    paragraph.push("<hr>");
+    paragraph.push("<b>Ready to continue?</b>");
+    exp.HtmlGui.append_paragraphs(paragraph);
+
+    // create a button for the user to press to acknowledge
+    exp.HtmlGui.append_button( "Yes", this.step_completed_signal.emit.bind(this.step_completed_signal) );
+    exp.HtmlGui.clear_message()
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Override the <AbstractStep> execute method.
+  ///
+  execute () {
+    this._db.EventsTable.add_new_row("beginning block step #" + this._blocknum);
+    this._run_next_trial();
+    exp.HtmlGui.show_message(".", "black");
+  }
+}
+///////////////////////////////////////////////////////////////////////////////
+///
+/// RewardBlockStep is a sub class of BlockStep that overrides the
+/// ShowSummary() method to also score/reward the user based on their
+/// performance.
+///
+exp.RewardBlockStep = class extends exp.BlockStep {
+  constructor ( db, blocknum ) {
+    super(db, blocknum);
+    this._responseTimeBins;
+    this._responseTimes;
+    if (this._db._reward_bins_array == undefined) {
+      this._db._reward_bins_array = [];
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// The construction of the trial is separated out into this function so that
+  /// subclasses may override this step.
+  ///
+  _construct_trial (chart_dataset) {
+    // this is a constructor for some exp.AbstractTrial derived subclass
+    return new exp.RewardTrial(chart_dataset, this._db, this._blocknum==1);
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// helper method: bin the response times up from the block that occurred
+  /// before this most recent block.
+  ///
+  _quantiles (data, quantiles) {
+    let sorted_data = data.slice().sort(function(a,b){return a-b});
+    let result = [];
+    for (let i = 0; i < quantiles.length; i++) {
+      result.push( sorted_data[Math.round((sorted_data.length-1) * quantiles[i])] );
+    }
+    return result;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Calculate and record the quantiles from the response times.
+  ///
+  _bin_response_times_from_block () {
+    // get the trial records for the most recently completed block:
+    let raw_data = this._all_trials_data;
+    let response_times = [];
+    for (let i = 0; i < raw_data.length; i++) {
+      response_times.push(raw_data[i].responseTime);
+    }
+
+    //
+    // Per design, exclude first 10 trials from first block of the experiment
+    // from the quantiles calculation.
+    //
+    response_times = (this._blocknum == 1) ? response_times : response_times.slice(10)
+    let bins = this._quantiles(response_times, [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]).slice(1);
+
+    this._db._reward_bins_array.push(bins);
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Calculate and return the total reward from this block
+  ///
+  _get_sum_of_reward_scores_from_block () {
+    if (this._blocknum > 1) {
+      let raw_data = this._all_trials_data;
+      let total_reward = 0.0;
+      for (let i = 0; i < raw_data.length; i++) {
+        total_reward += raw_data[i].reward_score;
+      }
+      return total_reward;
+    } else {
+      return 0;
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Record the results after all the trials have been completed.
+  ///
+  _save_data () {
+    this._bin_response_times_from_block();
+    this._total_score = this._get_sum_of_reward_scores_from_block();
+    this._db.ExperimentTable.add_new_row(this._blocknum, this._all_trials_data, this._total_score);
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// overridden method
+  /// shows the summary page for the most recently completed block.
+  ///
+  _show_summary () {
+    // clear everything
+    // show a continue button for the user to click
+    let total_score = this._total_score;
+
+    let paragraph = [];
+    paragraph.push("<br><br><br>");
+    paragraph.push("<b>You Completed Block #" + this._blocknum + "!</b>");
+    paragraph.push("<hr>");
+    paragraph.push("Your Accuracy: " + (Math.round(util.Util.mean(this._accuracy_data) * 1000)/10) + "%");
+    paragraph.push("<hr>");
+    if (this._blocknum > 1) {
+      paragraph.push("Bonus Speed Points Earned: " + total_score);
+      paragraph.push("<hr>");
+    }
+    paragraph.push("<b>Ready to continue?</b>");
+    exp.HtmlGui.append_paragraphs(paragraph);
+
+    // create a button for the user to press to acknowledge
+    exp.HtmlGui.append_button( "Yes", this.step_completed_signal.emit.bind(this.step_completed_signal) );
+    exp.HtmlGui.clear_message()
+  }
+}
+///////////////////////////////////////////////////////////////////////////////
+///
+/// RandomBlockStep is a sub class of RewardBlockStep that overrides the
+/// _construct_trial() method to so that the user receives a random score
+/// instead of one based on their performance.
+///
+exp.RandomBlockStep = class extends exp.RewardBlockStep {
+  constructor ( db, blocknum ) {
+    super(db, blocknum);
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// The construction of the trial is separated out into this function so that
+  /// subclasses may override this step.
+  ///
+  _construct_trial (chart_dataset) {
+    // this is a constructor for some exp.AbstractTrial derived subclass
+    return new exp.RandomTrial(chart_dataset, this._db, this._blocknum);
+  }
+}
+///////////////////////////////////////////////////////////////////////////////
+///
+/// Abstract Base Class for Block Trials
+///
+exp.AbstractTrial = class {
+  constructor () {
+    this.trial_completed_signal = null //new util.Signal();
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// All subclasses should override this method in order to provide the
+  /// behavior for the trial.
+  ///
+  run_trial () {
+    throw ("abstract method called");
+  }
+}
+///////////////////////////////////////////////////////////////////////////////
+///
+/// <Trial> represents a trial of a block.
+///
+exp.Trial = class extends exp.AbstractTrial {
+  constructor (chart_dataset) {
+    super()
+    this.trial_completed_signal = new util.Signal();
+
+    // create an object to store the data for this Trial
+    this.trial_data = { "trialCreatedAt" : performance.now() };
+    // this is the amount of time a message is shown to the user after hitting
+    // a response key
+    this.length_of_time_debreifing_is_shown = 1000; //ms
+    // this is the amount of time a fixation cross is shown to the user before
+    // the graphic is shown
+
+
+    //TODO: blank screen 500ms
+
+    //TODO: cue for 1000ms
+
+    this.length_of_time_cross_is_shown = 1500 // ms
+    // this is the dataset which the chart widget displays
+    this.chart_dataset = chart_dataset;
+    // this maps the answer keys to the target numbers
+    this.answer_keys = new Map([ ["v", 2], ["b", 3], ["n", 4], ["m", 5] ]);
+    // this is a counter for the total number of keys the user presses during
+    // the trial
+    this.num_keys_pressed = 0;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// helper method which creates and initializes the settings for the chart-
+  /// graphic for this trial.
+  ///
+  initialize_chart_settings () {
+    exp.HtmlGui.clear_header();
+    exp.HtmlGui.clear_workspace();
+
+    this.chart_widget = new exp.ChartWidget( exp.HtmlGui.workspace() );
+    this.chart_widget.set_data( this.chart_dataset );
+    this.chart_widget.set_ring_radius( 45 );
+    this.chart_widget.set_square_size( 4 );
+    this.chart_widget.set_cross_color( "rgb(255,255,255)" );
+    this.chart_widget.set_square_colors(["rgb(198, 0, 198)", "rgb(95, 158, 160)", "rgb(128, 128, 128)"]);
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// helper method which creates and initializes the KeyFilter to capture user
+  /// input during this trial.
+  ///
+  initialize_keyboard () {
+    this.keyboard = new util.KeyFilter( (function (the_key_the_user_pressed) {
+      let time_stamp = performance.now();
+      this.num_keys_pressed += 1;
+
+      if (this.answer_keys.has(the_key_the_user_pressed)) {
+        this.respond_to_valid_user_keyboard_input(the_key_the_user_pressed, time_stamp);
+      } else {
+        this.respond_to_invalid_user_keyboard_input(the_key_the_user_pressed);
+      }
+    }).bind(this), false );
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// helper method providing the logic for what happens when the user hits a
+  /// valid key.
+  ///
+  respond_to_valid_user_keyboard_input (the_key_the_user_pressed, time_stamp) {
+    let result = false;
+    if ( this.answer_keys.get(the_key_the_user_pressed) == this.chart_dataset.optTargDigit ||
+         this.answer_keys.get(the_key_the_user_pressed) == this.chart_dataset.nonOptTargDigit ) {
+      result = true;
+    } else {
+      util.Util.play_beep_sound();
+    }
+
+    this.trial_data.blockTrial = this._trial_number_in_block;
+    this.trial_data.blockNumber = this._block_number;
+    this.trial_data.optColorIndex = this.chart_dataset.optColorIndex;
+    this.trial_data.nonOptColorIndex = this.chart_dataset.nonOptColorIndex;
+    this.trial_data.distColorIndex = this.chart_dataset.distColorIndex;
+    this.trial_data.optTargPos = this.chart_dataset.optTargPos;
+    this.trial_data.nonOptTargPos = this.chart_dataset.nonOptTargPos;
+    this.trial_data.optTargDigit = this.chart_dataset.optTargDigit;
+    this.trial_data.nonOptTargDigit = this.chart_dataset.nonOptTargDigit;
+    this.trial_data.response = this.answer_keys.get(the_key_the_user_pressed);
+    this.trial_data.targChoice = this.trial_data.response == this.trial_data.optTargDigit ? 1 :
+                                  this.trial_data.response == this.trial_data.nonOptTargDigit ? 2 :
+                                  0;
+    this.trial_data.acc = result ? 1 : 0;
+    this.trial_data.bool = result;
+    this.trial_data.rt = time_stamp - this.trial_data.chart_shown_to_user_at_time;
+    this.trial_data.answerKeyRecieved = the_key_the_user_pressed;
+    this.trial_data.answerDigitRecieved = this.answer_keys.get(the_key_the_user_pressed);
+    this.trial_data.numberOfKeysPressed = this.num_keys_pressed;
+    this.trial_data.answerRecievedAt = time_stamp;
+    this.trial_data.result = result ? "correct" : "incorrect";
+    this.trial_data.chart_dataset = this.chart_dataset;
+
+    this.keyboard = this.keyboard.destroy();
+    this.show_debriefing();
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// helper method providing the logic for what happens when the user hits an
+  /// invalid key.
+  ///
+  respond_to_invalid_user_keyboard_input (the_key_the_user_pressed) {
+    exp.HtmlGui.show_message("Key '" + the_key_the_user_pressed + "' not recognized. Please use: 'v' for 2, 'b' for 3, 'n' for 4, and 'm' for 5", "red");
+
+    util.Util.play_beep_sound();
+
+    setTimeout( function () {
+      exp.HtmlGui.show_message(".", "black");
+    }, 2000 );
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// helper method providing the logic for what is shown to the user after
+  /// completing the trial by providing valid user input.
+  ///
+  show_debriefing () {
+    // WL: this is adapted from RewardTrial.js
+    if (this.trial_data.result == "incorrect") {
+      this.chart_widget.clear_and_show_text("Incorrect");
+    } else {
+      this.chart_widget.clear_and_show_text("Correct");
+    }
+
+    if (window._secret_speed != undefined) {
+      this.length_of_time_debreifing_is_shown = window._secret_speed;
+    }
+
+    setTimeout( (function () {
+      this.chart_widget = this.chart_widget.destroy();
+      this.trial_completed_signal.emit(this.trial_data);
+    }).bind(this), this.length_of_time_debreifing_is_shown );
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Executes this trial of the block.
+  ///
+  run_trial () {
+    this.initialize_chart_settings();
+    this.initialize_keyboard();
+
+    // show the fixation cross
+    this.chart_widget.show_cross_only();
+
+    if (window._secret_speed != undefined) {
+      this.length_of_time_cross_is_shown = window._secret_speed;
+    }
+
+    // wait a second...
+    setTimeout( (function () {
+      // show the chart and turn on the keypress listener:
+      this.chart_widget.show();
+      this.keyboard.turn_on();
+      this.trial_data.chart_shown_to_user_at_time = performance.now();
+    }).bind(this), this.length_of_time_cross_is_shown );
+  }
+}
+///////////////////////////////////////////////////////////////////////////////
+///
+/// This sub-class modifies the normal Trial class to provide user feedback on
+/// their proformance and potential financial reward.
+///
+/// The rewards are based on the response times from the previous block.
+/// (Block#1 has no rewards.) The previous block response times are binned
+/// into 5 bins. At the end of a trial, we check the response time against the
+/// bins and reward 1-5 points based on speed.  If the user gets the answer
+/// wrong they get 0 points.
+///
+/// Reaction times are still recorded and binned for incorrect answers.
+///
+/// The RewardBlock class is responsible for recording/binning the response
+/// times. The RewardTrial class is responsible for placing the current
+/// response time into a bin and displaying the current score to the user.
+///
+/// The needed data for this binning task is communicated via the Database
+/// object both classes have access to.
+///
+exp.RewardTrial = class extends exp.Trial {
+  constructor (chart_dataset, db, is_first_block) {
+    super(chart_dataset);
+    this._is_first_block = is_first_block;
+    this._db = db;  // reference to the database object
+    this._message = ['Incorrect', 'Very Slow', 'Slow', 'Moderate', 'Fast', 'Very Fast!'];
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// After the user has provided an answer, this function looks at the
+  /// response time and assigned a score of 1-5 based on performance.
+  ///
+  calculate_and_record_score_for_this_trial () {
+    const response_was_not_correct = (!this.trial_data.bool);
+
+    //
+    // Score of 0 if they got it wrong
+    //
+    if (response_was_not_correct) {
+      this.trial_data.reward_score = 0;
+
+    //
+    // Score if they got it right
+    //
+    //                 #1    #2    #3    #4    #5
+    // Example bins: [0.12, 0.34, 0.56, 0.78, 0.90]
+    // i < bin[0] == 5 points
+    // i < bin[1] == 4 points
+    // i < bin[2] == 3 points
+    // i < bin[3] == 2 points
+    // else == 1 points
+    //
+    } else {
+      let reaction_time = this.trial_data.responseTime;
+      let rba = this._db._reward_bins_array;
+      if (rba.length > 0) {
+        let bins = rba[rba.length-1];
+        let score = 1;
+        for (let i = 0; i < bins.length-1; i++) {
+          if (reaction_time < bins[i]) {
+            score = 5 - i;
+            break;
+          }
+        }
+        this.trial_data.reward_score = score;
+
+      //
+      // A score is N/A for the first block of the experiment.
+      //
+      } else {
+        this.trial_data.reward_score = null;
+      }
+    }
+    return this.trial_data.reward_score;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Display on the screen a chart indicating the reaction time of the trial
+  /// compared to the response time distribution of the previous block of
+  /// trials.
+  ///
+  show_score_graphic (score) {
+    if (this._is_first_block) {
+      let paragraph = [];
+      if (score == 0) {
+          paragraph.push(`
+            <div class="ace_centered_div_container">
+              <font class="ace_centered_div_content" size="24pt" face="monospace">
+                Incorrect
+              </font>
+            </div>`
+          );
+      } else {
+        paragraph.push(`
+          <div class="ace_centered_div_container">
+            <font class="ace_centered_div_content" size="24pt" face="monospace">
+              Correct
+            </font>
+          </div>`
+        );
+      }
+      exp.HtmlGui.append_paragraphs(paragraph);
+    } else {
+      exp.HtmlGui.append_image(this._db.score_images_array[score])
+      let paragraph = [];
+      let numbers = ['0', '1', '2', '3', '4', '5'];
+      paragraph.push(`
+        <p style="text-align:center">
+          <font class="ace_centered_div_content" size="24pt" face="monospace">
+            <br><br><br><br><br>
+            <br><br><br><br><br>
+            <br><br><br><br><br>`
+          + numbers[score]
+          + `<br><br>`
+          + this._message[score]
+          + `</font>
+        </p>`
+      );
+      exp.HtmlGui.append_paragraphs(paragraph);
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// helper method providing the logic for what is shown to the user after
+  /// completing the trial by providing valid user input.
+  ///
+  show_debriefing ()  {
+    this.chart_widget = this.chart_widget.destroy();
+
+    let score = this.calculate_and_record_score_for_this_trial();
+    this.show_score_graphic(score);
+
+    if (window._secret_speed != undefined) {
+      this.length_of_time_debreifing_is_shown = window._secret_speed;
+    }
+
+    setTimeout( (function () {
+      exp.HtmlGui.clear_workspace();
+      this.trial_completed_signal.emit(this.trial_data);
+    }).bind(this), this.length_of_time_debreifing_is_shown );
+  }
+}
+///////////////////////////////////////////////////////////////////////////////
+///
+/// This sub-class modifies the reward Trial class so that the user recieves a
+/// random reward instead of one based on their reaction time.
+///
+exp.RandomTrial = class extends exp.RewardTrial {
+  constructor (chart_dataset, db, block_num) {
+    super(chart_dataset, db, block_num == 1);
+    this._message = ['Incorrect', 'Correct', 'Correct', 'Correct', 'Correct', 'Correct'];
+    this._block_num = block_num;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Using the supplied scoring matrix, generate a random score for the trial.
+  /// The scoring matrix is a input to the RandomReward version of the
+  /// experiment and it weights the reward based on the performance of the
+  /// performance-contingent version of the experiment.
+  ///
+  _generate_score () {
+    try {
+      if (this._db._histogram != undefined) {
+        let H = this._db._histogram;
+        let B = this._block_num - 1;
+        let RV = Math.random();
+        if (RV <= H[B][0]) {
+          return 1;
+        } else if (H[B][0] < RV && RV <= H[B][1]) {
+          return 2;
+        } else if (H[B][1] < RV && RV <= H[B][2]) {
+          return 3;
+        } else if (H[B][2] < RV && RV <= H[B][3]) {
+          return 4;
+        } else {
+          return 5;
+        }
+      } else {
+       return util.Util.gen_random_int(1, 5, true);
+      }
+    } catch (error) {
+      this._db.EventsTable.add_new_row("Error in RandomTrial::_generate_score()");
+      console.error(error);
+      return util.Util.gen_random_int(1, 5, true);
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// After the user has provided an answer, this function assigns
+  /// a random score between score of 1-5. Score of 0 if incorrect.
+  ///
+  calculate_and_record_score_for_this_trial () {
+    const response_was_not_correct = (!this.trial_data.bool);
+
+    //
+    // Score of 0 if they got it wrong
+    //
+    if (response_was_not_correct) {
+      this.trial_data.reward_score = 0;
+    } else {
+      let rba = this._db._reward_bins_array;
+      if (rba.length > 0) {
+        let score = this._generate_score();
+        this.trial_data.reward_score = score;
+      //
+      // A score is N/A for the first block of the experiment.
+      //
+      } else {
+        this.trial_data.reward_score = null;
+      }
+    }
+    return this.trial_data.reward_score;
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+///
+/// The <BriefingSet> is used to put an image on the screen. The step will
+/// end when the user types the "key".
+///
+exp.BriefingStep = class extends(util.AbstractStep) {
+  constructor(db, htmlImgTag, callbackKey) {
+    super();
+    this._db = db;
+    this._htmlImgTag = htmlImgTag;
+    this._callbackKey = callbackKey;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Override the <AbstractStep> execute method.
+  ///
+  execute () {
+    // show the image on screen
+    exp.HtmlGui.clear_header();
+    exp.HtmlGui.clear_workspace();
+    exp.HtmlGui.append_paragraphs([this._htmlImgTag])
+
+    // if the user hits the callbackKey, then the step will exit
+    let keyboard = new util.KeyFilter( (function (key) {
+        if (key == this._callbackKey) {
+          keyboard.destroy();
+          this._db.EventsTable.add_new_row("briefing was step completed");
+          this.step_completed_signal.emit();
+        }
+      }).bind(this)
+    );
+  }
+}
+///////////////////////////////////////////////////////////////////////////////
+///
+/// <FeedbackStep> gathers general feedback from the participant.
+///
+exp.FeedbackStep = class extends(util.AbstractStep) {
+  constructor ( db ) {
+    super();
+    this._db = db;
+  }
+      
+    
+  validateForm() {
+        let x = document.forms["myForm"]["Text1"].value;
+        alert(x);
+        this._db._userFeedback = x;
+        this._db.EventsTable.add_new_row("user feedback was collected");
+        setTimeout(this.step_completed_signal.emit(), 100);
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Override the AbstractStep execute method.
+  ///
+  execute () {
+
+      
+    exp.HtmlGui.clear_workspace();
+
+    let paragraphs = []
+    paragraphs.push("<br><br><br>");
+    paragraphs.push("<hr>");
+    paragraphs.push('Please describe what you were thinking about during the task (i.e. strategy for completing the task, thoughts, moods, location) or general feedback about the experiment.');
+    paragraphs.push('<br><br><br>');
+    paragraphs.push('If you do not want ot provide this information type NA.');
+    paragraphs.push('<br><br><br>');
+    paragraphs.push('<textarea name="Text1" cols="40" rows="5"></textarea> <br>');
+    paragraphs.push("<hr>");
+      
+    exp.HtmlGui.append_paragraphs(paragraphs);
+    exp.HtmlGui.append_button( "Continue", this.validateForm.bind(this) );
+
+  }
+}
+///////////////////////////////////////////////////////////////////////////////
+///
+/// <SubmitDataStep> concludes the "HIT"/experiment and lets the user submit
+/// their data to the MTURK servers.
+///
+exp.SubmitDataStep = class extends(util.AbstractStep) {
+  constructor ( db ) {
+    super();
+    this._db = db;
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Override the AbstractStep execute method.
+  ///
+  execute () {
+    exp.HtmlGui.clear_workspace();
+
+    let paragraphs = []
+    paragraphs.push("<br><br><br>");
+    // paragraphs.push("<hr>");
+    // paragraphs.push('<b>*IMPORTANT*</b>')
+    // paragraphs.push('Return to the Amazon MTurk website where you accepted this HIT.')
+    // paragraphs.push('You must click the <font color="red"><b>[Submit Button]</b></font> there to complete this HIT.')
+    paragraphs.push("<hr>");
+    paragraphs.push("Thank you for participating in our experiment!");
+    paragraphs.push("Your responses are recorded.")
+    paragraphs.push("We will give you credit within 24 hours.");
+    paragraphs.push("If you have any questions, comments, or concerns, please email us at all of the following emails:");
+    paragraphs.push("li.6942@osu.edu, leber.30@osu.edu, cognitivecontrol@osu.edu");
+    paragraphs.push("<hr>");
+    exp.HtmlGui.append_paragraphs(paragraphs)
+
+    this._db.EventsTable.add_new_row("about to submit experiment");
+    //console.log(this._db);
+    //
+    // Save the user's data as a cookie on thier machine. It will be retrieved
+    // and deleted when they navigate back to the Amazon MTURK website.
+    //
+    localStorage.setItem(window._acvs_guid, btoa(JSON.stringify(this._db)));
+    // WL: test
+    $.ajax({
+      type: "POST",
+      url: "backend.php",
+      data: {"full": JSON.stringify(this._db)},
+      success: function() {
+        console.log("success");
+      },
+      failure: function(errMsg) {
+        alert(errMsg);
+      }
+    });
+
+    //
+    // set a cookie to indicate they have completed this experiment
+    //
+    // util.Util.set_cookie("completed_acvs", "true", 30);
+    //
+    // for debugging
+    //
+    console.log(this._db)
+  }
+}
+///////////////////////////////////////////////////////////////////////////////
+///
+/// The default implementation of the Adaptive Choice Experiment.
+///
+/// let experiment = new exp.DefaultExperiment();
+/// experiment.run();
+///
+exp.DefaultExperiment = class extends util.ExperimentBase {
+  constructor (version) {
+    super(version);
+    //
+    // Set up the database
+    //
+    this._db.experiment_type = 'DefaultVersion'
+
+    this._db.add_new_table("EventsTable");
+    this._db.EventsTable.add_new_column("What");
+
+    this._db.add_new_table("ExperimentTable");
+    this._db.ExperimentTable.add_new_column("BlockNumber");
+    this._db.ExperimentTable.add_new_column("AllTrialsData");
+
+    //
+    // Set up the experiment
+    //
+    this.add_new_step( new exp.BrowserAuditStep(this._db) );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="includes/files/instructions/Slide1.PNG">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="includes/files/instructions/Slide2.PNG">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="includes/files/instructions/Slide3.PNG">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="includes/files/instructions/Slide4.PNG">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="includes/files/instructions/Slide5.PNG">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="includes/files/instructions/Slide6.PNG">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="includes/files/instructions/Slide7.PNG">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="includes/files/instructions/Slide8.PNG">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="includes/files/instructions/Slide9.PNG">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="includes/files/instructions/Slide10.PNG">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="includes/files/instructions/Slide11.PNG">'], " ") );
+
+
+    // this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://bb.githack.com/Clemente159/mturk_adaptive_choice/raw/default/images/StartInstr2.png" style="width:90vmin;">'], " ") );
+    // this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://bb.githack.com/Clemente159/mturk_adaptive_choice/raw/default/images/StartInstr3.png" style="width:90vmin;">'], " ") );
+
+    let number_of_blocks = 2;
+    for (let i = 1; i <= number_of_blocks; i++) {
+      this.add_new_step( new exp.BlockStep(this._db, i));
+    }
+
+    this.add_new_step( new exp.SubmitDataStep(this._db) );
+  }
+}
+///////////////////////////////////////////////////////////////////////////////
+///
+/// A modified version of the implementation of the Adaptive Choice Experiment
+/// featuring performance based rewards.
+///
+/// let experiment = new exp.RewardExperiment();
+/// experiment.run();
+///
+exp.RewardExperiment = class extends util.ExperimentBase {
+  constructor (version) {
+    super(version);
+    //
+    // Set up the database
+    //
+    this._db.experiment_type = 'RewardVersion'
+    this._db.score_images_array = [];
+
+    function load_image(url) {
+      let img = new Image();
+      img.src = url
+      return img;
+    }
+    //
+    // Preload the trial "reward" images
+    //
+    this._db.score_images_array.push(load_image('https://testbucketformturkimages.s3-us-east-2.amazonaws.com/error.png'));
+    this._db.score_images_array.push(load_image('https://testbucketformturkimages.s3-us-east-2.amazonaws.com/gauge1.png'));
+    this._db.score_images_array.push(load_image('https://testbucketformturkimages.s3-us-east-2.amazonaws.com/gauge2.png'));
+    this._db.score_images_array.push(load_image('https://testbucketformturkimages.s3-us-east-2.amazonaws.com/gauge3.png'));
+    this._db.score_images_array.push(load_image('https://testbucketformturkimages.s3-us-east-2.amazonaws.com/gauge4.png'));
+    this._db.score_images_array.push(load_image('https://testbucketformturkimages.s3-us-east-2.amazonaws.com/gauge5.png'));
+
+
+    this._db.add_new_table("EventsTable");
+    this._db.EventsTable.add_new_column("What");
+
+    this._db.add_new_table("ExperimentTable");
+    this._db.ExperimentTable.add_new_column("BlockNumber");
+    this._db.ExperimentTable.add_new_column("AllTrialsData");
+    this._db.ExperimentTable.add_new_column("RewardPoints");
+
+
+    //
+    // Set up the experiment
+    // =====================
+    //
+    // Consent Form Slide:
+    //
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide27.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BrowserAuditStep(this._db) );
+
+    //
+    // Initial Instruction Slides:
+    //
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide1.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide2.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide3.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide4.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide5.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide6.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide7.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide8.PNG" style="height:90vmin;">'], " ") );
+
+    //
+    // Blocks and reward images:
+    //
+    this.add_new_step( new exp.RewardBlockStep(this._db, 1));
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide10.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide11.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide12.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide13.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide14.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide15.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide16.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide17.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.RewardBlockStep(this._db, 2));
+    this.add_new_step( new exp.RewardBlockStep(this._db, 3));
+    this.add_new_step( new exp.RewardBlockStep(this._db, 4));
+    this.add_new_step( new exp.RewardBlockStep(this._db, 5));
+
+    //
+    // Submission step:
+    //
+    //this.add_new_step( new exp.FeedbackStep(this._db) );
+    this.add_new_step( new exp.SubmitDataStep(this._db) );
+  }
+}
+///////////////////////////////////////////////////////////////////////////////
+///
+/// A modified version of the implementation of the Adaptive Choice Experiment
+/// featuring random rewards.
+///
+/// let experiment = new exp.RandomExperiment();
+/// experiment.run();
+///
+exp.RandomExperiment = class extends util.ExperimentBase {
+  constructor (version) {
+    super(version);
+    //
+    // Set up the database
+    //
+    this._db.experiment_type = 'RandomVersion'
+    this._db.score_images_array = [];
+
+    function load_image(url) {
+      let img = new Image();
+      img.src = url
+      return img;
+    }
+
+    //
+    // Preload the trial "reward" images
+    //
+    this._db.score_images_array.push(load_image('https://testbucketformturkimages.s3-us-east-2.amazonaws.com/error.png'));
+    this._db.score_images_array.push(load_image('https://testbucketformturkimages.s3-us-east-2.amazonaws.com/gauge1.png'));
+    this._db.score_images_array.push(load_image('https://testbucketformturkimages.s3-us-east-2.amazonaws.com/gauge2.png'));
+    this._db.score_images_array.push(load_image('https://testbucketformturkimages.s3-us-east-2.amazonaws.com/gauge3.png'));
+    this._db.score_images_array.push(load_image('https://testbucketformturkimages.s3-us-east-2.amazonaws.com/gauge4.png'));
+    this._db.score_images_array.push(load_image('https://testbucketformturkimages.s3-us-east-2.amazonaws.com/gauge5.png'));
+
+
+    this._db.add_new_table("EventsTable");
+    this._db.EventsTable.add_new_column("What");
+
+    this._db.add_new_table("ExperimentTable");
+    this._db.ExperimentTable.add_new_column("BlockNumber");
+    this._db.ExperimentTable.add_new_column("AllTrialsData");
+    this._db.ExperimentTable.add_new_column("RewardPoints");
+
+    //
+    // Load histogram
+    // ==============
+    //
+    (function load_latest_histogram () {
+      for (let i=0; i <= 30; i++) {
+        let script = document.createElement('script');
+        script.src = "https://acvsreward.s3-us-east-2.amazonaws.com/?"; // PYTHON_REPLACE_HISTO
+        document.head.appendChild(script);
+      }
+    })()
+    function wait_for_load () {
+      try {
+        this._db._reward_histogram = _histogram();
+        this._db.EventsTable.add_new_row("Successfully loaded histogram");
+      } catch (error) {
+        this._db.EventsTable.add_new_row("Failed to load histogram");
+        console.log(error);
+      }
+      console.log('.')
+    }
+    setTimeout(wait_for_load.bind(this), 10000); // wait a few seconds for the script to load...
+
+    //
+    // Set up the experiment
+    // =====================
+    //
+    // Consent Form Slide:
+    //
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide27.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BrowserAuditStep(this._db) );
+
+    //
+    // Initial Instruction Slides:
+    //
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide1.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide2.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide3.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide4.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide5.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide6.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide7.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide8.PNG" style="height:90vmin;">'], " ") );
+
+    //
+    // Blocks and reward images:
+    //
+    this.add_new_step( new exp.RandomBlockStep(this._db, 1));
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide19.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide20.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide21.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide22.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide23.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide24.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide25.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.BriefingStep(this._db, ['<img src="https://testbucketformturkimages.s3-us-east-2.amazonaws.com/Slide26.PNG" style="height:90vmin;">'], " ") );
+    this.add_new_step( new exp.RandomBlockStep(this._db, 2));
+    this.add_new_step( new exp.RandomBlockStep(this._db, 3));
+    this.add_new_step( new exp.RandomBlockStep(this._db, 4));
+    this.add_new_step( new exp.RandomBlockStep(this._db, 5));
+
+    //
+    // Submission step:
+    //
+    //this.add_new_step( new exp.FeedbackStep(this._db) );
+    this.add_new_step( new exp.SubmitDataStep(this._db) );
+  }
+}
+window.onload = function () {
+  //
+  // Amazon-MTurk script to set the userId for the subject.
+  //
+  //turkSetAssignmentID();
+  window._acvs_guid = "78AA3BF1B3C34A9CB8DA33B17B01649A";
+
+  exp.HtmlGui.show_header("EAL4 Experiment (REP online) - Cognitive Control Laboratory");
+
+  //
+  // If we are just beginning the experiment, and we are NOT in an iframe...
+  //
+  if (!util.Util.window_is_iframe()) {
+
+    if (navigator.cookieEnabled == false) {
+      d3.select("#ace_instructions").style("display", "none");
+      d3.select("body").append("p").html("You must enable cookies in your browser to complete this HIT. All cookies for this experiment are set to automatically expire. Thank you!");
+      return;
+    }
+
+    if (util.Util.get_cookie("completed_acvs") == "true") {
+      d3.select("#ace_instructions").style("display", "none");
+      alert("Do NOT complete this HIT a second time! Thank you.");
+      d3.select("body").append("p").html("You appear to have already completed this experiment. Please contact Cognitive Control Lab if you have further questions. Thank you!");
+      return;
+    }
+
+    //if (assignmentID != "ASSIGNMENT_ID_NOT_AVAILABLE") {
+      //
+      // We have an assignmentID and are all set to run the experiment. Hide
+      // the new window button.
+      //
+      d3.select(".ace_open_tab_button").style("display", "none");
+      d3.select("#ace_instructions").style("display", "none");
+
+      //
+      // Begin the experiment.
+      //
+      const experiment = new exp.DefaultExperiment(acvs_version);
+      //const experiment = new exp.RewardExperiment(acvs_version);
+      //const experiment = new exp.RandomExperiment(acvs_version);
+      // const use_random = Math.random() >= 0.5
+      // const experiment = use_random ?
+      //                    new exp.RandomExperiment(acvs_version):
+      //                    new exp.RewardExperiment(acvs_version);
+      //console.log("Random Version: ", use_random)
+      experiment.run();
+
+    //} else {
+      //
+      // Otherwise the user does not have an id, so we can assume that they
+      // haven't accepted the HIT yet.
+      //
+      //alert("Please accept the hit first!")
+      //
+      // Hide the new window button.
+      //
+    //   d3.select(".ace_open_tab_button").style("display", "none");
+    //   d3.select("#ace_instructions").style("display", "none");
+    //   d3.select("body").append("p").html("Please go back MTurk and accept the HIT first.");
+    // }
+  }
+}
+
+
+function validate_form() {
+  //
+  // clear out the users local storage only when they hit the submit button
+  //
+  if (localStorage.getItem(window._acvs_guid) != null) { // PYTHON_FLAG
+    d3.select("#user_result").attr("value", localStorage.getItem(window._acvs_guid));
+    alert("Thanks!");
+    localStorage.removeItem(window._acvs_guid);
+  } else {
+    alert("Please complete the experiment first");
+    return false;
+  }
+}
+  </script>
+
+</body>
+</html>
